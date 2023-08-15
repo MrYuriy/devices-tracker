@@ -1,8 +1,8 @@
 from django.contrib import admin
 from .models import (
-    Site, Department,
-    Status, DeviceType,
-    Port, IP, Device
+    DeviceSite, DeviceDepartment,
+    DeviceStatus, DeviceType,
+    DevicePort, DeviceIP, Device
 )
 from django import forms
 
@@ -31,12 +31,12 @@ class MyDeviceAdminForm(forms.ModelForm):
 
 
 class PortAdmin(admin.ModelAdmin):
-    list_display = ("port", "site")
+    list_display = ("name", "site")
     search_fields = ("port",)
 
 
 class DeviceAdmin(admin.ModelAdmin):
-    list_display = ("device_name", "get_ports", "device_ip")
+    list_display = ("name", "get_ports", "device_ip")
     form = MyDeviceAdminForm
 
     def get_ports(self, obj):
@@ -46,9 +46,9 @@ class DeviceAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Device, DeviceAdmin)
-admin.site.register(Port, PortAdmin)
-admin.site.register(Status)
+admin.site.register(DevicePort, PortAdmin)
+admin.site.register(DeviceStatus)
 admin.site.register(DeviceType)
-admin.site.register(Site)
-admin.site.register(Department)
-admin.site.register(IP)
+admin.site.register(DeviceSite)
+admin.site.register(DeviceDepartment)
+admin.site.register(DeviceIP)

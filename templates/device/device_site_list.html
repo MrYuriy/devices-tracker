@@ -13,7 +13,7 @@
       <tbody>
           {% for site in site_list %}
           <tr>
-              <td>{{ site.site }}</td>
+              <td>{{ site.name }}</td>
           </tr>
       {% endfor %}
       </tbody>
@@ -22,6 +22,8 @@
   {% else %}
     <p>There are no sites in Site!</p>
   {% endif %}
+
+  <a class="button" style="float: right;" href="{% url 'device:site-create' %}">Create</a>
 
  
 
