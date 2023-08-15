@@ -1,10 +1,5 @@
 from django.urls import path
 from .views import (
-    DeviceListView,
-    DeviceCreateView,
-    DeviceUpdateView,
-    DeviceDeleteView,
-
     DeviceSiteListView,
     DeviceSiteCreateView,
     DeviceSiteUpdateView,
@@ -24,7 +19,24 @@ from .views import (
     DeviceTypeCreateView,
     DeviceTypeUpdateView,
     DeviceTypeDeleteView,
+
+    DevicePortListView,
+    DevicePortCreateView,
+    DevicePortUpdateView,
+    DevicePortDeleteView,
+
+    DeviceIPListView,
+    DeviceIPCreateView,
+    DeviceIPUpdateView,
+    DeviceIPDeleteView,
+
+    DeviceListView,
+    DeviceCreateView,
+    DeviceUpdateView,
+    DeviceDeleteView,
+
 )
+
 urlpatterns = [
     path(
         "device-sites/",
@@ -105,28 +117,96 @@ urlpatterns = [
     ),
 
     path(
-        "device/create",
+        "device-types/create",
+        DeviceTypeCreateView.as_view(),
+        name="device-type-create"
+    ),
+
+    path(
+        "device-types/<int:pk>/update/",
+        DeviceTypeUpdateView.as_view(),
+        name="device-type-update"
+    ),
+
+    path(
+        "device-types/<int:pk>/delete/",
+        DeviceTypeDeleteView.as_view(),
+        name="device-type-delete"
+    ),
+
+    path(
+        "device-ports/",
+        DevicePortListView.as_view(),
+        name="device-port-list"
+    ),
+
+    path(
+        "device-ports/create",
+        DevicePortCreateView.as_view(),
+        name="device-port-create"
+    ),
+
+    path(
+        "device-ports/<int:pk>/update/",
+        DevicePortUpdateView.as_view(),
+        name="device-port-update"
+    ),
+
+    path(
+        "device-ports/<int:pk>/delete/",
+        DevicePortDeleteView.as_view(),
+        name="device-port-delete"
+    ),
+
+    path(
+        "device-ips/",
+        DeviceIPListView.as_view(),
+        name="device-ip-list"
+    ),
+
+    path(
+        "device-ips/create",
+        DeviceIPCreateView.as_view(),
+        name="device-ip-create"
+    ),
+
+    path(
+        "device-ips/<int:pk>/update/",
+        DeviceIPUpdateView.as_view(),
+        name="device-ip-update"
+    ),
+
+    path(
+        "device-ips/<int:pk>/delete/",
+        DeviceIPDeleteView.as_view(),
+        name="device-ip-delete"
+    ),
+
+    path(
+        "devices/",
+        DeviceListView.as_view(),
+        name="device-list"
+    ),
+
+    path(
+        "devices/create",
         DeviceCreateView.as_view(),
         name="device-create"
     ),
 
     path(
-        "device/<int:pk>/update/",
+        "devices/<int:pk>/update/",
         DeviceUpdateView.as_view(),
         name="device-update"
     ),
 
     path(
-        "device/<int:pk>/delete/",
+        "devices/<int:pk>/delete/",
         DeviceDeleteView.as_view(),
         name="device-delete"
     ),
-    path(
-        "devices/",
-        DeviceListView.as_view(),
-        name="device-list"
 
-    ),
+
 ]
 
 app_name = "device"
