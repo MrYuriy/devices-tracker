@@ -4,7 +4,4 @@ urlpatterns = [
     
 ]
 
-
-
-
 app_name = "device"
