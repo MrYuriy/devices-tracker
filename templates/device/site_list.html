@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Sites</h1>
+  {% if site_list %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for site in site_list %}
+          <tr>
+              <td>{{ site.site }}</td>
+          </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>There are no sites in Site!</p>
+  {% endif %}
+
+ 
+
+{% endblock %}
