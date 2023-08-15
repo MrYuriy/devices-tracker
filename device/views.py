@@ -1,7 +1,12 @@
 from django.shortcuts import render
 from django.views import generic
 from django.urls import reverse_lazy
+from django.db import transaction
 
+from django.shortcuts import get_object_or_404
+from transaction.utils import create_transaction
+
+from django.forms.models import model_to_dict
 from device.forms import DeviceDepartmentForm, DevicePortForm, DeviceIPForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import (
@@ -146,6 +151,39 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
     fields = "__all__"
     success_url = reverse_lazy("device:device-list")
     template_name = "device/device_form.html"
+
+    def form_valid(self, form):
+        original_device = self.get_object()
+        new_device = form.save(commit=False)  # Don't save yet
+
+        changes = {}  # Dictionary to store changes
+
+        for field in new_device._meta.fields:  # Loop through all fields of the model
+            field_name = field.name
+            old_value = getattr(original_device, field_name)
+            new_value = getattr(new_device, field_name)
+
+            if old_value != new_value:
+                changes[field_name] = {
+                    'old_value': old_value,
+                    'new_value': new_value
+                }
+
+        if original_device.device_serial_number != new_device.device_serial_number:
+            with transaction.atomic():
+                original_device.device_ports.clear()
+                original_device.device_status = get_object_or_404(DeviceStatus, name="REPLACED")
+                new_device.pk = None
+                new_device.save()
+        if changes:
+            create_transaction(
+                user=self.request.user,
+                device=original_device,
+                changed_fields=changes
+            )
+
+        original_device.save()
+        return super().form_valid(form)
 
 
 class DeviceDeleteView(LoginRequiredMixin, generic.DeleteView):

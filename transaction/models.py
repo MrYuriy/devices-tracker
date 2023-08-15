@@ -4,6 +4,7 @@ from device.models import Device
 
 from user.models import User
 
+
 # Create your models here.
 
 class Transaction(models.Model):
