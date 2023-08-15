@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Devices</h1>
+  {% if device_list %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>Device Type</th>
+          <th>Serial Number</th>
+          <th>Status</th>
+          <th>Ip</th>
+          <th>Ports</th>
+          <th>Department</th>
+          <th>Model</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for device in device_list %}
+        <tr>
+          <td>{{ device.name }}</td>
+          <td>{{ device.device_type.name }}</td>
+          <td>{{ device.device_serial_number }}</td>
+          <td>{{ device.device_status }}</td>
+          <td>{{ device.device_ip }}</td>
+          <td>
+            {% if device.device_ports %}
+            {% for port in device.device_ports.all %}
+              {{ port.name }}
+            {% endfor %}
+            {% else %}
+              <p>-</p>
+            {% endif %}
+          </td>
+          <td>{{ device.department }}</td>
+          <td>{{ device.device_model }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>There are no sites in Site!</p>
+  {% endif %}
+
+{% endblock %}
