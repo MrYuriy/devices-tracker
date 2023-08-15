@@ -2,13 +2,14 @@
 {% load crispy_forms_filters %}
 
 {% block content %}
-  <h1 class="title">{{ object|yesno:"Update,Create" }} Site</h1>
+  <h1 class="title">{{ object|yesno:"Update,Create" }} Status</h1>
             <form action="" method="post" novalidate>
                 {% csrf_token %}
                 {{ form|crispy }}
-                
+                    <br>  
                     <input class="btn btn-primary" type="submit" value="Submit">
             </form>
-            <a href="{% url 'device:device-site-list' %}"><button class="btn btn-secondary">Cancel</button></a>
+            <br>
+            <a href="{% url 'device:device-status-list' %}"><button class="btn btn-secondary">Cancel</button></a>
     
 {% endblock %}
