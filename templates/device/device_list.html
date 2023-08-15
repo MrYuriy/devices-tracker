@@ -2,6 +2,33 @@
 
 {% block content %}
   <h1>Devices</h1>
+<form method="get">
+    <label for="status">Filter by Status:</label>
+    <select name="status" id="status">
+        <option value="">All</option>
+        {% for status in device_status_list %}
+            <option value="{{ status.id }}">{{ status.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="device_type">Filter by Device Type:</label>
+    <select name="device_type" id="device_type">
+        <option value="">All</option>
+        {% for device_type in device_type_list %}
+            <option value="{{ device_type.id }}">{{ device_type.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="department">Filter by Department:</label>
+    <select name="department" id="department">
+        <option value="">All</option>
+        {% for department in department_list %}
+            <option value="{{ department.id }}">{{ department.name }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Apply Filter</button>
+  </form>
   {% if device_list %}
   <div class="table-responsive">
     <table class="table">
