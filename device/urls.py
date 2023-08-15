@@ -20,6 +20,18 @@ from .views import (
     DeviceTypeUpdateView,
     DeviceTypeDeleteView,
 
+    DevicePortListView,
+    DevicePortCreateView,
+    DevicePortUpdateView,
+    DevicePortDeleteView,
+
+    DeviceIPListView,
+    DeviceIPCreateView,
+    DeviceIPUpdateView,
+    DeviceIPDeleteView,
+
+    
+
 
 )
 urlpatterns = [
@@ -95,7 +107,7 @@ urlpatterns = [
         name="device-status-delete"
     ),
 
-     path(
+    path(
         "device-types/",
         DeviceTypeListView.as_view(),
         name="device-type-list"
@@ -113,10 +125,58 @@ urlpatterns = [
         name="device-type-update"
     ),
 
-     path(
+    path(
         "device-types/<int:pk>/delete/",
         DeviceTypeDeleteView.as_view(),
         name="device-type-delete"
+    ),
+
+    path(
+        "device-ports/",
+        DevicePortListView.as_view(),
+        name="device-port-list"
+    ),
+
+    path(
+        "device-ports/create",
+        DevicePortCreateView.as_view(),
+        name="device-port-create"
+    ),
+
+    path(
+        "device-ports/<int:pk>/update/",
+        DevicePortUpdateView.as_view(),
+        name="device-port-update"
+    ),
+
+    path(
+        "device-ports/<int:pk>/delete/",
+        DevicePortDeleteView.as_view(),
+        name="device-port-delete"
+    ),
+
+    path(
+        "device-ips/",
+        DeviceIPListView.as_view(),
+        name="device-ip-list"
+    ),
+
+     path(
+        "device-ips/create",
+        DeviceIPCreateView.as_view(),
+        name="device-ip-create"
+    ),
+
+    path(
+        "device-ips/<int:pk>/update/",
+        DeviceIPUpdateView.as_view(),
+        name="device-ip-update"
+    ),
+
+    path(
+        "device-ips/<int:pk>/delete/",
+        DeviceIPDeleteView.as_view(),
+        name="device-ip-delete"
     ),
 
 
