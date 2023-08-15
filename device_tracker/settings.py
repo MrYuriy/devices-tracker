@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "device",
+    "user",
+    "transaction",
 ]
 
 MIDDLEWARE = [
@@ -55,7 +57,7 @@ ROOT_URLCONF = "device_tracker.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -100,6 +102,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "user.User"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -117,6 +121,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+
+STATICFILES_DIRS = (BASE_DIR / "static",)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
