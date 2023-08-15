@@ -2,19 +2,24 @@
 
 {% block content %}
   <h1>Sites</h1>
-  {% if site_list %}
+  {% if device_site_list %}
   <div class="table-responsive">
     <table class="table">
       <thead class="thead-dark">
         <tr>
           <th>Name</th>
+          <th>Update</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody>
-          {% for site in site_list %}
+          {% for site in device_site_list %}
           <tr>
               <td>{{ site.name }}</td>
+              <td><a class="text-info" href="{% url 'device:device-site-update' pk=site.id %}">Update</a></td>
+              <td><a class="text-danger" href="{% url 'device:device-site-delete' pk=site.id %}">Delete</a></td>
           </tr>
+          
       {% endfor %}
       </tbody>
     </table>
@@ -23,7 +28,7 @@
     <p>There are no sites in Site!</p>
   {% endif %}
 
-  <a class="button" style="float: right;" href="{% url 'device:site-create' %}">Create</a>
+  <a class="button" style="float: right;" href="{% url 'device:device-site-create' %}">Create</a>
 
  
 

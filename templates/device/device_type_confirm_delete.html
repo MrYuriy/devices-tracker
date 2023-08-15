@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 class="title">Delete Type</h1>
+
+    <p style="font-size: 24px;">Are you sure you want to delete type: <strong class="text-success">{{ devicetype }}</strong></p>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Yes, delete" class="btn btn-danger">
+    </form>
+    <br>
+    <a href="{% url 'device:device-type-list' %}"><button class="btn btn-secondary">Cancel</button></a>
+{% endblock %}
