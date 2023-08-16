@@ -7,7 +7,12 @@ from django.shortcuts import get_object_or_404
 from transaction.utils import create_transaction
 
 from django.forms.models import model_to_dict
-from device.forms import DeviceDepartmentForm, DevicePortForm, DeviceIPForm
+from device.forms import (
+    DeviceDepartmentForm,
+    DevicePortForm,
+    DeviceIPForm,
+    DeviceUpdateForm
+)
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import (
     Device,
@@ -153,7 +158,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
 
         department_id = self.request.GET.get("department")
         if department_id:
-            department = get_object_or_404(DeviceDepartment, pk=department_id)
+            department = get_object_or_404(DeviceDepartmentr, pk=department_id)
             queryset = queryset.filter(department=department)
 
         return queryset
@@ -175,7 +180,7 @@ class DeviceCreateView(LoginRequiredMixin, generic.CreateView):
 
 class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Device
-    fields = "__all__"
+    form_class = DeviceUpdateForm
     success_url = reverse_lazy("device:device-list")
     template_name = "device/device_form.html"
 

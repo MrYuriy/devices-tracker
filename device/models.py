@@ -81,8 +81,12 @@ class Device(models.Model):
     name = models.CharField(max_length=255)
     device_serial_number = models.CharField(max_length=255, unique=True)
     device_status = models.ForeignKey(DeviceStatus, on_delete=models.CASCADE)
-    device_ip = models.ForeignKey(DeviceIP, blank=True, null=True, on_delete=models.SET_NULL)
-    device_ports = models.ManyToManyField(DevicePort, related_name="devices", blank=True)
+    device_ip = models.ForeignKey(DeviceIP, blank=True, null=True, related_name="devices", on_delete=models.SET_NULL)
+    device_ports = models.ManyToManyField(
+        DevicePort,
+        related_name="devices",
+        blank=True,
+    )
     department = models.ForeignKey(DeviceDepartment, on_delete=models.CASCADE, related_name="devices")
     device_model = models.CharField(max_length=255)
 
