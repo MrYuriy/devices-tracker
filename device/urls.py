@@ -188,11 +188,7 @@ urlpatterns = [
         DeviceListView.as_view(),
         name="device-list"
     ),
-    path(
-        "devices/<int:device_type_id>/",
-        DeviceListView.as_view(),
-        name="device-list-filter"
-    ),
+
     path(
         "devices/create",
         DeviceCreateView.as_view(),
