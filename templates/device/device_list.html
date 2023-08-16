@@ -55,7 +55,7 @@
       <tbody>
         {% for device in device_list %}
         <tr>
-          <td>{{ device.name }}</td>
+          <td><a class="text-primary" href="{% url 'device:device-detail' pk=device.id %}">{{ device.name }}</a></td>
           <td>{{ device.device_type.name }}</td>
           <td>{{ device.device_serial_number }}</td>
           <td>{{ device.device_status }}</td>

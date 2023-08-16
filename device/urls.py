@@ -1,42 +1,19 @@
 from django.urls import path
-from .views import (
-    DeviceSiteListView,
-    DeviceSiteCreateView,
-    DeviceSiteUpdateView,
-    DeviceSiteDeleteView,
 
-    DeviceDepartmentListView,
-    DeviceDepartmentCreateView,
-    DeviceDepartmentUpdateView,
-    DeviceDepartmentDeleteView,
-
-    DeviceStatusListView,
-    DeviceStatusCreateView,
-    DeviceStatusUpdateView,
-    DeviceStatusDeleteView,
-
-    DeviceTypeListView,
-    DeviceTypeCreateView,
-    DeviceTypeUpdateView,
-    DeviceTypeDeleteView,
-
-    DevicePortListView,
-    DevicePortCreateView,
-    DevicePortUpdateView,
-    DevicePortDeleteView,
-
-    DeviceIPListView,
-    DeviceIPCreateView,
-    DeviceIPUpdateView,
-    DeviceIPDeleteView,
-
-    DeviceListView,
-    DeviceCreateView,
-    DeviceUpdateView,
-    DeviceDeleteView,
-
-    HomeView,
-)
+from .views import (DeviceCreateView, DeviceDeleteView,
+                    DeviceDepartmentCreateView, DeviceDepartmentDeleteView,
+                    DeviceDepartmentListView, DeviceDepartmentUpdateView,
+                    DeviceDetailView, DeviceIPCreateView, DeviceIPDeleteView,
+                    DeviceIPListView, DeviceIPUpdateView, DeviceListView,
+                    DevicePortCreateView, DevicePortDeleteView,
+                    DevicePortListView, DevicePortUpdateView,
+                    DeviceSiteCreateView, DeviceSiteDeleteView,
+                    DeviceSiteListView, DeviceSiteUpdateView,
+                    DeviceStatusCreateView, DeviceStatusDeleteView,
+                    DeviceStatusListView, DeviceStatusUpdateView,
+                    DeviceTypeCreateView, DeviceTypeDeleteView,
+                    DeviceTypeListView, DeviceTypeUpdateView, DeviceUpdateView,
+                    HomeView)
 
 urlpatterns = [
     path(
@@ -193,6 +170,12 @@ urlpatterns = [
         "devices/create",
         DeviceCreateView.as_view(),
         name="device-create"
+    ),
+
+    path(
+        "devices/<int:pk>/detail",
+        DeviceDetailView.as_view(),
+        name="device-detail"
     ),
 
     path(
