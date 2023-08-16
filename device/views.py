@@ -1,33 +1,18 @@
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
+from django.db.models import Q
+from django.forms.models import model_to_dict
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views import generic
 from django.views.generic.base import TemplateView
-from device.forms import DeviceDepartmentForm, DeviceIPForm, DevicePortForm
+
+from device.forms import (DeviceDepartmentForm, DeviceIPForm, DevicePortForm,
+                          DeviceSearchForm, DeviceUpdateForm)
+from transaction.utils import create_transaction
 
 from .models import (Device, DeviceDepartment, DeviceIP, DevicePort,
                      DeviceSite, DeviceStatus, DeviceType)
-from django.db import transaction
-
-from django.shortcuts import get_object_or_404
-from transaction.utils import create_transaction
-
-from django.forms.models import model_to_dict
-from device.forms import (
-    DeviceDepartmentForm,
-    DevicePortForm,
-    DeviceIPForm,
-    DeviceUpdateForm
-)
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import (
-    Device,
-    DeviceDepartment,
-    DeviceIP,
-    DevicePort,
-    DeviceSite,
-    DeviceStatus,
-    DeviceType
-)
 
 
 # Device Site
@@ -147,10 +132,15 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
     model = Device
     template_name = "device/device_list.html"
     context_object_name = "device_list"
+    paginate_by = 20
 
     def get_queryset(self):
 
         queryset = super().get_queryset()
+        
+        form = DeviceSearchForm(self.request.GET)
+        if form.is_valid():
+            return queryset.filter(Q(name__icontains=form.cleaned_data["name"])|Q(device_serial_number__icontains=form.cleaned_data["name"]))
 
         status_id = self.request.GET.get("status")
         if status_id:
@@ -174,6 +164,16 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         context['device_status_list'] = DeviceStatus.objects.all()
         context['device_type_list'] = DeviceType.objects.all()
         context['department_list'] = DeviceDepartment.objects.all()
+        
+        name = self.request.GET.get("name", "")
+        device_serial_number = self.request.GET.get("name", "")
+        context["search_form"] = DeviceSearchForm(
+            initial={
+                "name": name,
+                "device_serial_number": device_serial_number
+            }
+        )
+
         return context
 
 

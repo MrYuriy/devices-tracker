@@ -3,12 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Q
 
-from device.models import (
-    DeviceDepartment,
-    DeviceIP,
-    DevicePort,
-    Device,
-)
+from device.models import Device, DeviceDepartment, DeviceIP, DevicePort
 
 
 class DeviceDepartmentForm(forms.ModelForm):
@@ -49,3 +44,13 @@ class DeviceUpdateForm(forms.ModelForm):
         self.fields["device_ports"].queryset = available_ports
         self.fields["device_ip"].queryset = available_ip
 
+
+class DeviceSearchForm(forms.Form):
+    name = forms.CharField(
+        max_length=255,
+        required=False,
+        label="",
+        widget=forms.TextInput(
+            attrs={"placeholder": "Search by name or serial number"}
+        )
+    )
