@@ -140,7 +140,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         
         form = DeviceSearchForm(self.request.GET)
         if form.is_valid():
-            return queryset.filter(Q(name__icontains=form.cleaned_data["name"])|Q(device_serial_number__icontains=form.cleaned_data["name"]))
+            queryset = queryset.filter(Q(name__icontains=form.cleaned_data["name"])|Q(device_serial_number__icontains=form.cleaned_data["name"]))
 
         status_id = self.request.GET.get("status")
         if status_id:
