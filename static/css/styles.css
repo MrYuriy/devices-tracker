@@ -9,3 +9,6 @@ body {
     color: blue;
 }
 
+.input-group{
+    align-items: flex-start;
+}

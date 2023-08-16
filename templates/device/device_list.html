@@ -2,6 +2,15 @@
 
 {% block content %}
   <h1>Devices</h1>
+
+
+  {% block search_form %}
+    {% include "includes/search_form.html" %}
+  {% endblock %}
+
+
+<form method="get">
+
 <form method="get" action="{% url 'device:device-list' %}">
     <label for="status">Filter by Status:</label>
     <select name="status" id="status">
