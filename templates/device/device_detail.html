@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="{% url 'device:device-list' %}">
+  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="text-dark" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5ZM10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5Z"/>
+  </svg>
+</a>
+<br>
+  <h1>Name: <strong>{{ device.name }}</strong></h1>
+    <hr>
+      <h1 style="text-align: center;">Description</h1>
+      <br>
+      <table class="table">
+        <thead class="thead-dark">  
+          <tr>
+            <th>Type</th>
+            <th>Serial number</th>
+            <th>Status</th>
+            <th>IP</th>
+            <th>Model</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ device.device_type }}</td>
+                <td>{{ device.device_serial_number }}</td>
+                <td>{{ device.device_status }}</td>
+                <td>{{ device.device_ip }}</td>
+                <td>{{ device.device_model }}</td>
+            </tr>
+        </tbody>
+        </table>
+      <hr>
+        <h1 style="text-align: center;">Department</h1>
+        <br>
+
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th>Name</th>
+              <th>Site</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td>{{ device.department.name }}</td>
+                <td>{{ device.department.site }}</td>
+              </tr>
+          </tbody>
+          </table>
+
+        
+        <hr>
+        <h1 style="text-align: center;">Port</h1>
+        <br>
+
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th>Name</th>
+              <th>Site</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for port in device.device_ports.all %}
+              <tr>
+                <td>{{ port.name }}</td>
+                <td>{{ port.site }}</td>
+              </tr>
+            {% empty %}
+              <p>No ports!</p>
+            {% endfor %}
+          </tbody>
+          </table>
+
+        <hr>
+    
+{% endblock %}

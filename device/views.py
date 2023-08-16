@@ -177,6 +177,11 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         return context
 
 
+class  DeviceDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Device
+    template_name = "device/device_detail.html"
+
+
 class DeviceCreateView(LoginRequiredMixin, generic.CreateView):
     model = Device
     fields = "__all__"
