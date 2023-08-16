@@ -1,18 +1,11 @@
 from django.shortcuts import render
-from django.views import generic
 from django.urls import reverse_lazy
+from django.views import generic
 
-from device.forms import DeviceDepartmentForm, DevicePortForm, DeviceIPForm
+from device.forms import DeviceDepartmentForm, DeviceIPForm, DevicePortForm
 
-from .models import (
-    Device,
-    DeviceDepartment,
-    DeviceIP,
-    DevicePort,
-    DeviceSite,
-    DeviceStatus,
-    DeviceType
-)
+from .models import (Device, DeviceDepartment, DeviceIP, DevicePort,
+                     DeviceSite, DeviceStatus, DeviceType)
 
 
 # Device Site
