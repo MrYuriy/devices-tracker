@@ -2,20 +2,12 @@
 
 {% block content %}
   <h1>Devices</h1>
-<form method="get">
+<form method="get" action="{% url 'device:device-list' %}">
     <label for="status">Filter by Status:</label>
     <select name="status" id="status">
         <option value="">All</option>
         {% for status in device_status_list %}
-            <option value="{{ status.id }}">{{ status.name }}</option>
-        {% endfor %}
-    </select>
-
-    <label for="device_type">Filter by Device Type:</label>
-    <select name="device_type" id="device_type">
-        <option value="">All</option>
-        {% for device_type in device_type_list %}
-            <option value="{{ device_type.id }}">{{ device_type.name }}</option>
+            <option value="{{ status.id }}" {% if request.GET.status|default_if_none:'' == status.id|stringformat:"s" %}selected{% endif %}>{{ status.name }}</option>
         {% endfor %}
     </select>
 
@@ -23,9 +15,11 @@
     <select name="department" id="department">
         <option value="">All</option>
         {% for department in department_list %}
-            <option value="{{ department.id }}">{{ department.name }}</option>
+            <option value="{{ department.id }}" {% if request.GET.department|default_if_none:'' == department.id|stringformat:"s" %}selected{% endif %}>{{ department.name }}</option>
         {% endfor %}
     </select>
+
+    <input type="hidden" name="device_type" value="{{ request.GET.device_type }}">
 
     <button type="submit">Apply Filter</button>
   </form>
