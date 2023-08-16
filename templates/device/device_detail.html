@@ -9,71 +9,27 @@
 <br>
   <h1>Name: <strong>{{ device.name }}</strong></h1>
     <hr>
-      <h1 style="text-align: center;">Description</h1>
-      <br>
-      <table class="table">
-        <thead class="thead-dark">  
+        <h1>Transaction</h1>
+    <hr>
+    <table class="table">
+        <thead class="thead-dark">
           <tr>
-            <th>Type</th>
-            <th>Serial number</th>
-            <th>Status</th>
-            <th>IP</th>
-            <th>Model</th>
+            <th>User</th>
+            <th>Datetime</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>{{ device.device_type }}</td>
-                <td>{{ device.device_serial_number }}</td>
-                <td>{{ device.device_status }}</td>
-                <td>{{ device.device_ip }}</td>
-                <td>{{ device.device_model }}</td>
-            </tr>
+          {% for transaction in transactions %}
+          <tr>
+            <td>{{ transaction.user.username }}</td>
+            <td>{{ transaction.datetime }}</td>
+            <td>{{ transaction.notes }}</td>
+          </tr>
+        {% empty %}
+            <td>There is no transaction</td>
+        {% endfor %}
         </tbody>
-        </table>
-      <hr>
-        <h1 style="text-align: center;">Department</h1>
-        <br>
-
-        <table class="table">
-          <thead class="thead-dark">
-            <tr>
-              <th>Name</th>
-              <th>Site</th>
-            </tr>
-          </thead>
-          <tbody>
-              <tr>
-                <td>{{ device.department.name }}</td>
-                <td>{{ device.department.site }}</td>
-              </tr>
-          </tbody>
-          </table>
-
-        
-        <hr>
-        <h1 style="text-align: center;">Port</h1>
-        <br>
-
-        <table class="table">
-          <thead class="thead-dark">
-            <tr>
-              <th>Name</th>
-              <th>Site</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for port in device.device_ports.all %}
-              <tr>
-                <td>{{ port.name }}</td>
-                <td>{{ port.site }}</td>
-              </tr>
-            {% empty %}
-              <p>No ports!</p>
-            {% endfor %}
-          </tbody>
-          </table>
-
-        <hr>
+      </table>
     
 {% endblock %}
