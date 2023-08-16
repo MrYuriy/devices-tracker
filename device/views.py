@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
-
+from django.views.generic.base import TemplateView
 from device.forms import DeviceDepartmentForm, DeviceIPForm, DevicePortForm
 
 from .models import (Device, DeviceDepartment, DeviceIP, DevicePort,
@@ -149,6 +149,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
     context_object_name = "device_list"
 
     def get_queryset(self):
+
         queryset = super().get_queryset()
 
         status_id = self.request.GET.get("status")
@@ -282,3 +283,12 @@ class DeviceIPDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = DeviceIP
     success_url = reverse_lazy("device:device-ip-list")
     template_name = "device/device_ip_confirm_delete.html"
+
+
+class HomeView(TemplateView):
+    template_name = "device/index.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['device_type_list'] = DeviceType.objects.all()
+        return context

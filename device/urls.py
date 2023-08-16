@@ -35,6 +35,7 @@ from .views import (
     DeviceUpdateView,
     DeviceDeleteView,
 
+    HomeView,
 )
 
 urlpatterns = [
@@ -187,7 +188,11 @@ urlpatterns = [
         DeviceListView.as_view(),
         name="device-list"
     ),
-
+    path(
+        "devices/<int:device_type_id>/",
+        DeviceListView.as_view(),
+        name="device-list-filter"
+    ),
     path(
         "devices/create",
         DeviceCreateView.as_view(),
@@ -205,7 +210,7 @@ urlpatterns = [
         DeviceDeleteView.as_view(),
         name="device-delete"
     ),
-
+    path("", HomeView.as_view(), name="home"),
 
 ]
 
