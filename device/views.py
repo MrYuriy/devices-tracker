@@ -1,5 +1,7 @@
+from typing import Any, Dict
+
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db import transaction
+from django.db import models, transaction
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404, render
@@ -9,6 +11,7 @@ from django.views.generic.base import TemplateView
 
 from device.forms import (DeviceDepartmentForm, DeviceIPForm, DevicePortForm,
                           DeviceSearchForm, DeviceUpdateForm)
+from transaction.models import Transaction
 from transaction.utils import create_transaction
 
 from .models import (Device, DeviceDepartment, DeviceIP, DevicePort,
@@ -181,7 +184,15 @@ class  DeviceDetailView(LoginRequiredMixin, generic.DetailView):
     model = Device
     template_name = "device/device_detail.html"
 
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        device = self.get_object()
+        
+        transactions = Transaction.objects.filter(device=device)
+        
+        context['transactions'] = transactions
+        return context
+       
 class DeviceCreateView(LoginRequiredMixin, generic.CreateView):
     model = Device
     fields = "__all__"
