@@ -4,7 +4,7 @@
   <h1>Device Types</h1>
   <ul>
     {% for device_type in device_type_list %}
-      <li><a href="{% url 'device:device-list' %}?device_type={{ device_type.id }}">{{ device_type.name }}</a></li>
+      <li class="list-group-item"><a href="{% url 'device:device-list' %}?device_type={{ device_type.id }}">{{ device_type.name }}</a></li>
     {% endfor %}
   </ul>
 {% endblock %}
