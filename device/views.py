@@ -210,7 +210,7 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
         if original_device.device_serial_number != new_device.device_serial_number:
             with transaction.atomic():
                 original_device.device_ports.clear()
-                original_device.device_status = get_object_or_404(DeviceStatus, name="REPLACED")
+                original_device.device_status = get_object_or_404(DeviceStatus, name__iexact="REPLACED")
                 new_device.pk = None
                 new_device.save()
         if changes:
