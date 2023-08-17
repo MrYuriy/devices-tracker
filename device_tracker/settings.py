@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+SPREADSHEET_ID = os.environ["SPREADSHEET_ID"]
 # Application definition
 
 INSTALLED_APPS = [
