@@ -58,8 +58,8 @@
           <td><a class="text-primary" href="{% url 'device:device-detail' pk=device.id %}">{{ device.name }}</a></td>
           <td>{{ device.device_type.name }}</td>
           <td>{{ device.device_serial_number }}</td>
-          <td>{{ device.device_status }}</td>
-          <td>{{ device.device_ip }}</td>
+          <td>{{ device.device_status.name }}</td>
+          <td>{{ device.device_ip.ip }}</td>
           <td>
             {% if device.device_ports %}
             {% for port in device.device_ports.all %}

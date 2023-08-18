@@ -17,6 +17,8 @@ from transaction.utils import create_transaction
 from .models import (Device, DeviceDepartment, DeviceIP, DevicePort,
                      DeviceSite, DeviceStatus, DeviceType)
 
+from django.urls import reverse
+
 
 # Device Site
 class DeviceSiteListView(LoginRequiredMixin, generic.ListView):
@@ -140,10 +142,11 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
 
         queryset = super().get_queryset()
-        
+
         form = DeviceSearchForm(self.request.GET)
         if form.is_valid():
-            queryset = queryset.filter(Q(name__icontains=form.cleaned_data["name"])|Q(device_serial_number__icontains=form.cleaned_data["name"]))
+            queryset = queryset.filter(Q(name__icontains=form.cleaned_data["name"]) | Q(
+                device_serial_number__icontains=form.cleaned_data["name"]))
 
         status_id = self.request.GET.get("status")
         if status_id:
@@ -167,7 +170,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         context['device_status_list'] = DeviceStatus.objects.all()
         context['device_type_list'] = DeviceType.objects.all()
         context['department_list'] = DeviceDepartment.objects.all()
-        
+
         name = self.request.GET.get("name", "")
         device_serial_number = self.request.GET.get("name", "")
         context["search_form"] = DeviceSearchForm(
@@ -176,28 +179,44 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
                 "device_serial_number": device_serial_number
             }
         )
+        device_type_id = self.request.session.get("device_type")
+        if device_type_id:
+            device_type = get_object_or_404(DeviceType, pk=device_type_id)
+            context["device_type"] = device_type
 
         return context
 
 
-class  DeviceDetailView(LoginRequiredMixin, generic.DetailView):
+class DeviceDetailView(LoginRequiredMixin, generic.DetailView):
     model = Device
     template_name = "device/device_detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         device = self.get_object()
-        
+
         transactions = Transaction.objects.filter(device=device)
-        
+
         context['transactions'] = transactions
         return context
-       
+
+
 class DeviceCreateView(LoginRequiredMixin, generic.CreateView):
     model = Device
     fields = "__all__"
     success_url = reverse_lazy("device:device-list")
     template_name = "device/device_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['device_type'] = self.request.GET.get('device_type')  # Отримання device_type з параметрів запиту
+        return context
+
+    def get_success_url(self):
+        device_type_id = self.request.session.get("device_type")
+        if device_type_id:
+            return reverse("device:device-list") + f"?device_type={device_type_id}"
+        return reverse("device:device-list")
 
 
 class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
@@ -205,6 +224,17 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
     form_class = DeviceUpdateForm
     success_url = reverse_lazy("device:device-list")
     template_name = "device/device_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['device_type'] = self.request.GET.get('device_type')  # Отримання device_type з параметрів запиту
+        return context
+
+    def get_success_url(self):
+        device_type_id = self.request.session.get("device_type")
+        if device_type_id:
+            return reverse("device:device-list") + f"?device_type={device_type_id}"
+        return reverse("device:device-list")
 
     def form_valid(self, form):
         original_device = self.get_object()
@@ -219,16 +249,11 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
 
             if old_value != new_value:
                 changes[field_name] = {
-                    'old_value': old_value,
-                    'new_value': new_value
+                    "old_value": old_value,
+                    "new_value": new_value
                 }
-
-        # if original_device.device_serial_number != new_device.device_serial_number:
-        #     with transaction.atomic():
-        #         original_device.device_ports.clear()
-        #         original_device.device_status = get_object_or_404(DeviceStatus, name__iexact="REPLACED")
-        #         new_device.pk = None
-        #         new_device.save()
+        device_type = form.cleaned_data.get("device_type")
+        self.request.session["device_type"] = device_type.id
         original_device = update_device
         original_device.save()
         if changes:

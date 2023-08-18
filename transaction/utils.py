@@ -112,9 +112,6 @@ def read_from_spreadsheet(device, notes):
         device=device,
         notes=notes
     )
-    print(row_to_write)
-    print("   ")
-    print(previous_row)
     write_to_spreadsheet(
         row_to_write=row_to_write,
         row_index=device_coordinate,

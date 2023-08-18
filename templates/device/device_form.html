@@ -5,6 +5,7 @@
   <h1 class="title">{{ object|yesno:"Update,Create" }} Device</h1>
             <form action="" method="post" novalidate>
                 {% csrf_token %}
+                <input type="hidden" name="device_type" value="{{ device_type }}">
                 {{ form|crispy }}
                     <br>
                     <input class="btn btn-primary" type="submit" value="Submit">
