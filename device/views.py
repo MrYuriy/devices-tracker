@@ -208,14 +208,14 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     def form_valid(self, form):
         original_device = self.get_object()
-        new_device = form.save(commit=False)  # Don't save yet
+        update_device = form.save(commit=False)  # Don't save yet
 
         changes = {}  # Dictionary to store changes
 
-        for field in new_device._meta.fields:  # Loop through all fields of the model
+        for field in update_device._meta.fields:  # Loop through all fields of the model
             field_name = field.name
             old_value = getattr(original_device, field_name)
-            new_value = getattr(new_device, field_name)
+            new_value = getattr(update_device, field_name)
 
             if old_value != new_value:
                 changes[field_name] = {
@@ -229,6 +229,8 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
         #         original_device.device_status = get_object_or_404(DeviceStatus, name__iexact="REPLACED")
         #         new_device.pk = None
         #         new_device.save()
+        original_device = update_device
+        original_device.save()
         if changes:
             create_transaction(
                 user=self.request.user,
@@ -236,7 +238,6 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
                 changed_fields=changes
             )
 
-        original_device.save()
         return super().form_valid(form)
 
 
