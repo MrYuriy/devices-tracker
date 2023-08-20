@@ -1,14 +1,16 @@
 <ul class="sidebar-nav list-group">
-    {% if user.is_authenticated %}
-      <li class="list-group-item">User: <a href="">{{ user.get_username }}</a></li>
-      <li class="list-group-item"><a href="{% url 'logout' %}">Logout</a></li>
-    {% else %}
-      <li class="list-group-item"><a href="{% url 'login' %}">Login</a></li>
-    {% endif %}
+  {% if request.user.is_authenticated %}
+    <li class="list-group-item">User: <a href="">{{ request.user.get_username }}</a></li>
+    <li class="list-group-item"><a href="{% url 'logout' %}">Logout</a></li>
+  {% else %}
+    <li class="list-group-item"><a href="{% url 'login' %}">Login</a></li>
+  {% endif %}
     
       <br>
     
       <li class="list-group-item"><a href="{% url 'device:home' %}">Home</a></li>
+    {% if request.user.is_superuser %}
+
       <li class="list-group-item"><a href="{% url 'device:device-site-list' %}">Sites</a></li>
       <li class="list-group-item"><a href="{% url 'device:device-department-list' %}">Departments</a></li>
       <li class="list-group-item"><a href="{% url 'device:device-status-list' %}">Statuses</a></li>
@@ -16,4 +18,12 @@
       <li class="list-group-item"><a href="{% url 'device:device-list' %}">Devices</a></li>
       <li class="list-group-item"><a href="{% url 'device:device-port-list' %}">Ports</a></li>
       <li class="list-group-item"><a href="{% url 'device:device-ip-list' %}">IPs</a></li>
+
+      <hr>
+      <li class="list-group-item"><a href="{% url 'user:user-list' %}">Employees</a></li>
+      {% else %}
+        <li class="list-group-item"><a href="">My account</a></li>
+      {% endif %}
+
+
     </ul>

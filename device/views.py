@@ -5,7 +5,7 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.base import TemplateView
 
@@ -16,8 +16,6 @@ from transaction.utils import create_transaction
 
 from .models import (Device, DeviceDepartment, DeviceIP, DevicePort,
                      DeviceSite, DeviceStatus, DeviceType)
-
-from django.urls import reverse
 
 
 # Device Site
