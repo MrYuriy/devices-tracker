@@ -15,7 +15,7 @@ class DeviceDepartment(models.Model):
     """
     like: Kontrola Wydanie
     """
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True)
     site = models.ForeignKey(DeviceSite, on_delete=models.CASCADE)
 
     class Meta:
@@ -24,7 +24,9 @@ class DeviceDepartment(models.Model):
         ]
 
     def __str__(self):
-        return self.name
+        if self.name != "":
+            return self.name
+        return self.site.name
 
 
 class DeviceStatus(models.Model):
