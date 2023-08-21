@@ -135,7 +135,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
     model = Device
     template_name = "device/device_list.html"
     context_object_name = "device_list"
-    paginate_by = 20
+    #paginate_by = 20
 
     def get_queryset(self):
 

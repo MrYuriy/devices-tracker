@@ -33,6 +33,7 @@
     <button type="submit">Apply Filter</button>
   </form>
   {% if device_list %}
+  <p>Total devices: {{ device_list.count }}</p>
   <div class="table-responsive">
     <table class="table">
       <thead class="thead-dark">
