@@ -24,9 +24,7 @@ class DeviceDepartment(models.Model):
         ]
 
     def __str__(self):
-        if self.name != "":
-            return self.name
-        return self.site.name
+        return f"{self.site.name} {self.name}"
 
 
 class DeviceStatus(models.Model):
