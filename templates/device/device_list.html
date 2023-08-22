@@ -28,6 +28,14 @@
         {% endfor %}
     </select>
 
+    <label for="site">Filter by Site:</label>
+    <select name="site" id="site">
+        <option value="">All</option>
+        {% for site in device_site_list %}
+            <option value="{{ site.id }}" {% if request.GET.site|default_if_none:'' == site.id|stringformat:"s" %}selected{% endif %}>{{ site.name }}</option>
+        {% endfor %}
+    </select>
+
     <input type="hidden" name="device_type" value="{{ request.GET.device_type }}">
 
     <button type="submit">Apply Filter</button>

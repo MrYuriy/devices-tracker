@@ -161,6 +161,12 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
             department = get_object_or_404(DeviceDepartment, pk=department_id)
             queryset = queryset.filter(department=department)
 
+        site_id = self.request.GET.get("site")
+        if site_id:
+            site = get_object_or_404(DeviceSite, pk=site_id)
+            queryset = queryset.filter(department__site=site)
+
+
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -168,6 +174,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         context['device_status_list'] = DeviceStatus.objects.all()
         context['device_type_list'] = DeviceType.objects.all()
         context['department_list'] = DeviceDepartment.objects.all()
+        context['device_site_list'] = DeviceSite.objects.all()
 
         name = self.request.GET.get("name", "")
         device_serial_number = self.request.GET.get("name", "")
