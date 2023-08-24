@@ -40,6 +40,7 @@
 
     <button type="submit">Apply Filter</button>
   </form>
+  <a class="button button-gray" style="float: right;" href="{% url 'device:device-create' %}">Create</a>
   {% if device_list %}
   <p>Total devices: {{ device_list.count }}</p>
   <div class="table-responsive">
@@ -91,6 +92,6 @@
     <p>There are no devices in Device!</p>
   {% endif %}
 
-  <a class="button" style="float: right;" href="{% url 'device:device-create' %}">Create</a>
+
 
 {% endblock %}
