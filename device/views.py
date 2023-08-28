@@ -12,7 +12,7 @@ from django.views.generic.base import TemplateView
 from device.forms import (DeviceDepartmentForm, DeviceIPForm, DevicePortForm,
                           DeviceSearchForm, DeviceUpdateCreateForm)
 from transaction.models import Transaction
-from transaction.utils import create_transaction
+from transaction.utils import create_transaction, read_from_spreadsheet
 
 from .models import (Device, DeviceDepartment, DeviceIP, DevicePort,
                      DeviceSite, DeviceStatus, DeviceType)
@@ -202,6 +202,16 @@ class DeviceDetailView(LoginRequiredMixin, generic.DetailView):
 
         context['transactions'] = transactions
         return context
+
+    def post(self, request, *args, **kwargs):
+        device = self.get_object()
+        comment = request.POST.get('comment')  # Get the comment from the form
+        comment = f"{date.today()} - {self.request.user} ad comment: {comment}"
+
+        transaction = Transaction(user=self.request.user, device=device, notes=comment)
+        transaction.save()
+        read_from_spreadsheet(notes=comment, device=device)
+        return self.get(request, *args, **kwargs)
 
 
 class DeviceCreateView(LoginRequiredMixin, generic.CreateView):
