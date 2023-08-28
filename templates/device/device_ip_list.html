@@ -2,6 +2,7 @@
 
 {% block content %}
   <h1>IP's</h1>
+<a class="button" style="float: right;" href="{% url 'device:device-ip-create' %}">Create</a>
   {% if device_ip_list %}
   <div class="table-responsive">
     <table class="table">
@@ -29,9 +30,5 @@
   {% else %}
     <p>There are no ip's in IP!</p>
   {% endif %}
-
-  <a class="button" style="float: right;" href="{% url 'device:device-ip-create' %}">Create</a>
-
- 
 
 {% endblock %}
