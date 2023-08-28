@@ -207,11 +207,11 @@ class DeviceDetailView(LoginRequiredMixin, generic.DetailView):
     def post(self, request, *args, **kwargs):
         device = self.get_object()
         comment = request.POST.get('comment')  # Get the comment from the form
-        comment = f"{date.today()} - {self.request.user} add comment: {comment}"
-
-        transaction = Transaction(user=self.request.user, device=device, notes=comment)
-        transaction.save()
-        read_from_spreadsheet(notes=comment, device=device)
+        if comment != "":
+            comment = f"{date.today()} - {self.request.user} add comment: {comment}"
+            transaction = Transaction(user=self.request.user, device=device, notes=comment)
+            transaction.save()
+            read_from_spreadsheet(notes=comment, device=device)
         return self.get(request, *args, **kwargs)
 
 
