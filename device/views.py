@@ -165,9 +165,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         if site_id:
             site = get_object_or_404(DeviceSite, pk=site_id)
             queryset = queryset.filter(department__site=site)
-
-
-        return queryset
+        return queryset.order_by("name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
