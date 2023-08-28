@@ -31,7 +31,7 @@ class DeviceIPForm(forms.ModelForm):
         fields = "__all__"
 
 
-class DeviceUpdateForm(forms.ModelForm):
+class DeviceUpdateCreateForm(forms.ModelForm):
     class Meta:
         model = Device
         fields = "__all__"

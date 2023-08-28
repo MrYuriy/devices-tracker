@@ -10,7 +10,7 @@ from django.views import generic
 from django.views.generic.base import TemplateView
 
 from device.forms import (DeviceDepartmentForm, DeviceIPForm, DevicePortForm,
-                          DeviceSearchForm, DeviceUpdateForm)
+                          DeviceSearchForm, DeviceUpdateCreateForm)
 from transaction.models import Transaction
 from transaction.utils import create_transaction
 
@@ -206,7 +206,7 @@ class DeviceDetailView(LoginRequiredMixin, generic.DetailView):
 
 class DeviceCreateView(LoginRequiredMixin, generic.CreateView):
     model = Device
-    fields = "__all__"
+    form_class = DeviceUpdateCreateForm
     success_url = reverse_lazy("device:device-list")
     template_name = "device/device_form.html"
 
@@ -224,7 +224,7 @@ class DeviceCreateView(LoginRequiredMixin, generic.CreateView):
 
 class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Device
-    form_class = DeviceUpdateForm
+    form_class = DeviceUpdateCreateForm
     success_url = reverse_lazy("device:device-list")
     template_name = "device/device_form.html"
 
