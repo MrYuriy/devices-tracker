@@ -7,16 +7,13 @@ from user.models import User
 
 # Create your models here.
 
+
 class Transaction(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="transactions"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="transactions"
     )
     device = models.ForeignKey(
-        Device,
-        on_delete=models.CASCADE,
-        related_name="transactions"
+        Device, on_delete=models.CASCADE, related_name="transactions"
     )
     datetime = models.DateTimeField(auto_now_add=True)
     notes = models.TextField()

@@ -5,6 +5,7 @@ class DeviceSite(models.Model):
     """
     like EMAG 445 493 999
     """
+
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
@@ -15,6 +16,7 @@ class DeviceDepartment(models.Model):
     """
     like: Kontrola Wydanie
     """
+
     name = models.CharField(max_length=255, blank=True)
     site = models.ForeignKey(DeviceSite, on_delete=models.CASCADE)
 
@@ -69,6 +71,7 @@ class DeviceIP(models.Model):
     """
     IP for printers
     """
+
     ip = models.GenericIPAddressField(unique=True)
     department = models.ForeignKey(DeviceDepartment, on_delete=models.CASCADE)
 
@@ -81,13 +84,21 @@ class Device(models.Model):
     name = models.CharField(max_length=255)
     device_serial_number = models.CharField(max_length=255, unique=True)
     device_status = models.ForeignKey(DeviceStatus, on_delete=models.CASCADE)
-    device_ip = models.ForeignKey(DeviceIP, blank=True, null=True, related_name="devices", on_delete=models.SET_NULL)
+    device_ip = models.ForeignKey(
+        DeviceIP,
+        blank=True,
+        null=True,
+        related_name="devices",
+        on_delete=models.SET_NULL,
+    )
     device_ports = models.ManyToManyField(
         DevicePort,
         related_name="devices",
         blank=True,
     )
-    department = models.ForeignKey(DeviceDepartment, on_delete=models.CASCADE, related_name="devices")
+    department = models.ForeignKey(
+        DeviceDepartment, on_delete=models.CASCADE, related_name="devices"
+    )
     device_model = models.CharField(max_length=255)
 
     def __str__(self):

@@ -38,8 +38,12 @@ class DeviceUpdateCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        available_ports = DevicePort.objects.filter(Q(devices__isnull=True) | Q(devices=self.instance))
-        available_ip = DeviceIP.objects.filter(Q(devices__isnull=True) | Q(devices=self.instance))
+        available_ports = DevicePort.objects.filter(
+            Q(devices__isnull=True) | Q(devices=self.instance)
+        )
+        available_ip = DeviceIP.objects.filter(
+            Q(devices__isnull=True) | Q(devices=self.instance)
+        )
 
         self.fields["device_ports"].queryset = available_ports
         self.fields["device_ip"].queryset = available_ip
@@ -52,5 +56,5 @@ class DeviceSearchForm(forms.Form):
         label="",
         widget=forms.TextInput(
             attrs={"placeholder": "Search by name or serial number"}
-        )
+        ),
     )

@@ -5,82 +5,185 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='DeviceDepartment',
+            name="DeviceDepartment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name='DeviceSite',
+            name="DeviceSite",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='DeviceStatus',
+            name="DeviceStatus",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, unique=True)),
             ],
             options={
-                'verbose_name': 'Devise status',
-                'verbose_name_plural': 'Devises status',
+                "verbose_name": "Devise status",
+                "verbose_name_plural": "Devises status",
             },
         ),
         migrations.CreateModel(
-            name='DeviceType',
+            name="DeviceType",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='DevicePort',
+            name="DevicePort",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.IntegerField(unique=True)),
-                ('site', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='device.devicesite')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.IntegerField(unique=True)),
+                (
+                    "site",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="device.devicesite",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='DeviceIP',
+            name="DeviceIP",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ip', models.GenericIPAddressField(unique=True)),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='device.devicedepartment')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("ip", models.GenericIPAddressField(unique=True)),
+                (
+                    "department",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="device.devicedepartment",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='devicedepartment',
-            name='site',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='device.devicesite'),
+            model_name="devicedepartment",
+            name="site",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="device.devicesite"
+            ),
         ),
         migrations.CreateModel(
-            name='Device',
+            name="Device",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('device_serial_number', models.CharField(max_length=255, unique=True)),
-                ('device_model', models.CharField(max_length=255)),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='devices', to='device.devicedepartment')),
-                ('device_ip', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='devices', to='device.deviceip')),
-                ('device_ports', models.ManyToManyField(blank=True, related_name='devices', to='device.deviceport')),
-                ('device_status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='device.devicestatus')),
-                ('device_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='device.devicetype')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("device_serial_number", models.CharField(max_length=255, unique=True)),
+                ("device_model", models.CharField(max_length=255)),
+                (
+                    "department",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="devices",
+                        to="device.devicedepartment",
+                    ),
+                ),
+                (
+                    "device_ip",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="devices",
+                        to="device.deviceip",
+                    ),
+                ),
+                (
+                    "device_ports",
+                    models.ManyToManyField(
+                        blank=True, related_name="devices", to="device.deviceport"
+                    ),
+                ),
+                (
+                    "device_status",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="device.devicestatus",
+                    ),
+                ),
+                (
+                    "device_type",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="device.devicetype",
+                    ),
+                ),
             ],
         ),
         migrations.AddConstraint(
-            model_name='devicedepartment',
-            constraint=models.UniqueConstraint(fields=('name', 'site'), name='unique_department'),
+            model_name="devicedepartment",
+            constraint=models.UniqueConstraint(
+                fields=("name", "site"), name="unique_department"
+            ),
         ),
     ]

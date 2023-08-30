@@ -47,10 +47,12 @@ def create_device(sheet, dev_type):
 
             device_type, _ = DeviceType.objects.get_or_create(name=dev_type)
             device_status, _ = DeviceStatus.objects.get_or_create(name="WORK")
-            site, _ = DeviceSite.objects.get_or_create(name=str(department["site"]).upper())
+            site, _ = DeviceSite.objects.get_or_create(
+                name=str(department["site"]).upper()
+            )
             department_obj, _ = DeviceDepartment.objects.get_or_create(
-                name=str(department["department"]).upper(),
-                site=site)
+                name=str(department["department"]).upper(), site=site
+            )
 
             dev = Device(
                 device_type=device_type,
@@ -58,7 +60,7 @@ def create_device(sheet, dev_type):
                 device_serial_number=device["S/N"],
                 device_status=device_status,
                 department=department_obj,
-                device_model=device["MODEL"]
+                device_model=device["MODEL"],
             )
             dev.save()
 
@@ -67,17 +69,20 @@ def create_device(sheet, dev_type):
                 if port_key in device:
                     if device[port_key] is not None:
                         try:
-                            port_site = str(port_key.split()[1]).upper().replace(" ", "")
+                            port_site = (
+                                str(port_key.split()[1]).upper().replace(" ", "")
+                            )
                             site, _ = DeviceSite.objects.get_or_create(name=port_site)
-                            port, _ = DevicePort.objects.get_or_create(name=device[port_key], site=site)
+                            port, _ = DevicePort.objects.get_or_create(
+                                name=device[port_key], site=site
+                            )
                             dev.device_ports.add(port)
                         except ObjectDoesNotExist:
                             pass
             if "IP" in device:
                 try:
                     device_ip, _ = DeviceIP.objects.get_or_create(
-                        ip=device["IP"],
-                        department=department_obj
+                        ip=device["IP"], department=department_obj
                     )
                     dev.device_ip = device_ip
                 except ObjectDoesNotExist:
@@ -87,6 +92,7 @@ def create_device(sheet, dev_type):
 
 
 # create_ports()
+
 
 def main():
     workbook = openpyxl.load_workbook("device_list.xlsx")
