@@ -24,7 +24,7 @@ httpAuth = credentials.authorize(httplib2.Http())
 service = apiclient.discovery.build("sheets", "v4", http=httpAuth)
 
 
-def write_to_spreadsheet(
+def write_dev_change_to_spreadsheet(
         row_to_write,
         row_index,
         previous_row,
@@ -112,7 +112,7 @@ def read_from_spreadsheet(device, notes):
         device=device,
         notes=notes
     )
-    write_to_spreadsheet(
+    write_dev_change_to_spreadsheet(
         row_to_write=row_to_write,
         row_index=device_coordinate,
         previous_row=previous_row,
