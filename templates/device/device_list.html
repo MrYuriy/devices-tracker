@@ -13,28 +13,33 @@
 
 <form method="get" action="{% url 'device:device-list' %}">
     <label for="status">Filter by Status:</label>
-    <select name="status" id="status">
-        <option value="">All</option>
+    <select name="status" id="status" multiple>
+<!--        <option value="">All</option>-->
         {% for status in device_status_list %}
-            <option value="{{ status.device_status__name }}" {% if request.GET.status|default_if_none:'' == status.device_status__name|stringformat:"s" %}selected{% endif %}>{{ status.device_status__name }}</option>
+            <option value="{{ status.device_status__name }}" {% if status.device_status__name in selected_statuses %}selected{% endif %}>{{ status.device_status__name }}</option>
         {% endfor %}
     </select>
 
     <label for="department">Filter by Department:</label>
-    <select name="department" id="department">
-        <option value="">All</option>
+    <select name="department" id="department" multiple>
+<!--        <option value="">All</option>-->
         {% for department in department_list %}
-            <option value="{{ department.department__site__name }} - {{ department.department__name }}" {% if request.GET.department == department.department__site__name|stringformat:"s"|add:" - "|add:department.department__name %}selected{% endif %}>{{ department.department__site__name }} - {{ department.department__name }}</option>
+            {% with department_name=department.department__site__name|add:" "|add:department.department__name %}
+            <option value="{{ department_name }}" {% if department_name in selected_departments %}selected{% endif %}>
+                {{ department_name }}
+            </option>
+            {% endwith %}
         {% endfor %}
     </select>
 
     <label for="site">Filter by Site:</label>
-    <select name="site" id="site">
-        <option value="">All</option>
+    <select name="site" id="site" multiple>
+<!--        <option value="">All</option>-->
         {% for site in device_site_list %}
-            <option value="{{ site.department__site__name }}" {% if request.GET.site|default_if_none:'' == site.department__site__name|stringformat:"s" %}selected{% endif %}>{{ site.department__site__name }}</option>
+            <option value="{{ site.department__site__name }}" {% if site.department__site__name in selected_sites %}selected{% endif %}>{{ site.department__site__name }}</option>
         {% endfor %}
     </select>
+
 
     <input type="hidden" name="device_type" value="{{ request.GET.device_type }}">
 
@@ -95,3 +100,39 @@
 
 
 {% endblock %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const select = document.getElementById("site");
+
+    select.addEventListener("change", function () {
+        const selectedValues = Array.from(select.selectedOptions, option => option.value);
+        const searchParams = new URLSearchParams(window.location.search);
+
+        if (selectedValues.length > 0) {
+            searchParams.set("site", selectedValues.join(","));
+        } else {
+            searchParams.delete("site");
+        }
+
+        const newUrl = window.location.pathname + "?" + searchParams.toString();
+        window.history.replaceState({}, "", newUrl);
+    });
+
+    // Restore selected values on page load
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedSites = urlParams.get("site");
+    if (selectedSites) {
+        const sitesArray = selectedSites.split(",");
+        sitesArray.forEach(site => {
+            const option = select.querySelector(`option[value="${site}"]`);
+            if (option) {
+                option.selected = true;
+            }
+        });
+    }
+});
+</script>
+
+
+
