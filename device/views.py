@@ -158,7 +158,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
     model = Device
     template_name = "device/device_list.html"
     context_object_name = "device_list"
-
+    queryset = Device.objects.all()
     # paginate_by = 20
 
     def get_queryset(self):
@@ -171,34 +171,31 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
                 | Q(device_serial_number__icontains=form.cleaned_data["name"])
             )
 
-        status_id = self.request.GET.get("status")
-        if status_id:
-            status = get_object_or_404(DeviceStatus, pk=status_id)
-            queryset = queryset.filter(device_status=status)
+        status_name = self.request.GET.get("status")
+        if status_name:
+            queryset = queryset.filter(device_status__name=status_name)
 
         device_type_id = self.request.GET.get("device_type")
         if device_type_id:
             device_type = get_object_or_404(DeviceType, pk=device_type_id)
             queryset = queryset.filter(device_type=device_type)
 
-        department_id = self.request.GET.get("department")
-        if department_id:
-            department = get_object_or_404(DeviceDepartment, pk=department_id)
-            queryset = queryset.filter(department=department)
+        department_name = self.request.GET.get("department")
+        if department_name:
+            department_site_name, department_name = department_name.split(' - ')
+            queryset = queryset.filter(department__site__name=department_site_name, department__name=department_name)
 
-        site_id = self.request.GET.get("site")
-        if site_id:
-            site = get_object_or_404(DeviceSite, pk=site_id)
-            queryset = queryset.filter(department__site=site)
+        site = self.request.GET.get("site")
+        if site:
+            queryset = queryset.filter(department__site__name=site)
         return queryset.order_by("name")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["device_status_list"] = DeviceStatus.objects.all()
-        context["device_type_list"] = DeviceType.objects.all()
-        context["department_list"] = DeviceDepartment.objects.all()
-        context["device_site_list"] = DeviceSite.objects.all()
-
+        context["device_status_list"] = Device.objects.values("device_status__name").distinct()
+        context["department_list"] = Device.objects.select_related('department__site').\
+            values("department__site__name", "department__name").distinct()
+        context["device_site_list"] = Device.objects.values("department__site__name").distinct()
         name = self.request.GET.get("name", "")
         device_serial_number = self.request.GET.get("name", "")
         context["search_form"] = DeviceSearchForm(
