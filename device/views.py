@@ -1,5 +1,8 @@
 from typing import Any, Dict
 from datetime import date
+from collections import defaultdict
+from django.db.models import Count
+from itertools import groupby
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models, transaction
@@ -10,13 +13,30 @@ from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.base import TemplateView
 
-from device.forms import (DeviceDepartmentForm, DeviceIPForm, DevicePortForm,
-                          DeviceSearchForm, DeviceUpdateCreateForm)
+from device.forms import (
+    DeviceDepartmentForm,
+    DeviceIPForm,
+    DevicePortForm,
+    DeviceSearchForm,
+    DeviceUpdateCreateForm,
+)
 from transaction.models import Transaction
-from transaction.utils import create_transaction, read_from_spreadsheet
+from transaction.utils import (
+    create_transaction,
+    write_dev_change_to_spreadsheet,
+    write_report_gs,
+    read_from_spreadsheet,
+)
 
-from .models import (Device, DeviceDepartment, DeviceIP, DevicePort,
-                     DeviceSite, DeviceStatus, DeviceType)
+from .models import (
+    Device,
+    DeviceDepartment,
+    DeviceIP,
+    DevicePort,
+    DeviceSite,
+    DeviceStatus,
+    DeviceType,
+)
 
 
 # Device Site
@@ -48,6 +68,7 @@ class DeviceSiteDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 
 # Device Department
+
 
 class DeviceDepartmentListView(LoginRequiredMixin, generic.ListView):
     model = DeviceDepartment
@@ -104,6 +125,7 @@ class DeviceStatusDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 # Device Type
 
+
 class DeviceTypeListView(LoginRequiredMixin, generic.ListView):
     model = DeviceType
     success_url = reverse_lazy("device:device-type-list")
@@ -136,16 +158,18 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
     model = Device
     template_name = "device/device_list.html"
     context_object_name = "device_list"
-    #paginate_by = 20
+
+    # paginate_by = 20
 
     def get_queryset(self):
-
         queryset = super().get_queryset()
 
         form = DeviceSearchForm(self.request.GET)
         if form.is_valid():
-            queryset = queryset.filter(Q(name__icontains=form.cleaned_data["name"]) | Q(
-                device_serial_number__icontains=form.cleaned_data["name"]))
+            queryset = queryset.filter(
+                Q(name__icontains=form.cleaned_data["name"])
+                | Q(device_serial_number__icontains=form.cleaned_data["name"])
+            )
 
         status_id = self.request.GET.get("status")
         if status_id:
@@ -170,18 +194,15 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['device_status_list'] = DeviceStatus.objects.all()
-        context['device_type_list'] = DeviceType.objects.all()
-        context['department_list'] = DeviceDepartment.objects.all()
-        context['device_site_list'] = DeviceSite.objects.all()
+        context["device_status_list"] = DeviceStatus.objects.all()
+        context["device_type_list"] = DeviceType.objects.all()
+        context["department_list"] = DeviceDepartment.objects.all()
+        context["device_site_list"] = DeviceSite.objects.all()
 
         name = self.request.GET.get("name", "")
         device_serial_number = self.request.GET.get("name", "")
         context["search_form"] = DeviceSearchForm(
-            initial={
-                "name": name,
-                "device_serial_number": device_serial_number
-            }
+            initial={"name": name, "device_serial_number": device_serial_number}
         )
         device_type_id = self.request.session.get("device_type")
         if device_type_id:
@@ -201,15 +222,17 @@ class DeviceDetailView(LoginRequiredMixin, generic.DetailView):
 
         transactions = Transaction.objects.filter(device=device)
 
-        context['transactions'] = transactions
+        context["transactions"] = transactions
         return context
 
     def post(self, request, *args, **kwargs):
         device = self.get_object()
-        comment = request.POST.get('comment')  # Get the comment from the form
+        comment = request.POST.get("comment")  # Get the comment from the form
         if comment != "":
             comment = f"{date.today()} - {self.request.user} add comment: {comment}"
-            transaction = Transaction(user=self.request.user, device=device, notes=comment)
+            transaction = Transaction(
+                user=self.request.user, device=device, notes=comment
+            )
             transaction.save()
             read_from_spreadsheet(notes=comment, device=device)
         return self.get(request, *args, **kwargs)
@@ -223,7 +246,9 @@ class DeviceCreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['device_type'] = self.request.GET.get('device_type')  # Отримання device_type з параметрів запиту
+        context["device_type"] = self.request.GET.get(
+            "device_type"
+        )  # Отримання device_type з параметрів запиту
         return context
 
     def get_success_url(self):
@@ -241,7 +266,9 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['device_type'] = self.request.GET.get('device_type')  # Отримання device_type з параметрів запиту
+        context["device_type"] = self.request.GET.get(
+            "device_type"
+        )  # Отримання device_type з параметрів запиту
         return context
 
     def get_success_url(self):
@@ -262,19 +289,14 @@ class DeviceUpdateView(LoginRequiredMixin, generic.UpdateView):
             new_value = getattr(update_device, field_name)
 
             if old_value != new_value:
-                changes[field_name] = {
-                    "old_value": old_value,
-                    "new_value": new_value
-                }
+                changes[field_name] = {"old_value": old_value, "new_value": new_value}
         device_type = form.cleaned_data.get("device_type")
         self.request.session["device_type"] = device_type.id
         original_device = update_device
         original_device.save()
         if changes:
             create_transaction(
-                user=self.request.user,
-                device=original_device,
-                changed_fields=changes
+                user=self.request.user, device=original_device, changed_fields=changes
             )
 
         return super().form_valid(form)
@@ -315,6 +337,7 @@ class DevicePortDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 # Device IP
 
+
 class DeviceIPListView(LoginRequiredMixin, generic.ListView):
     model = DeviceIP
     template_name = "device/device_ip_list.html"
@@ -346,5 +369,76 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['device_type_list'] = DeviceType.objects.all()
+        context["device_type_list"] = DeviceType.objects.all()
         return context
+
+
+class ReportsView(TemplateView):
+    template_name = "device/reports.html"
+    device_type_list = DeviceType.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["device_type_list"] = self.device_type_list
+        return context
+
+    def post(self, request, *args, **kwargs):
+        all_device = Device.objects.all()
+        device_type = request.POST.get("device_type")  # Get the comment from the form
+
+        device_counts = (
+            all_device.filter(device_type=device_type)
+            .values(
+                "device_type__name", "department__site__name", "device_status__name"
+            )
+            .annotate(count=Count("id"))
+        )
+
+        grouped_data = defaultdict(lambda: defaultdict(int))
+
+        list_dikt_all_status = []
+        status_list = list(
+            set([status["device_status__name"] for status in device_counts])
+        )
+
+        for item in device_counts:
+            key = (item["device_type__name"], item["department__site__name"])
+            status = item["device_status__name"]
+            count = item["count"]
+            grouped_data[key][status] += count
+
+        #  Виводимо груповані дані
+        for key, status_count in grouped_data.items():
+            device_type, site_name = key
+            combined_entry = {"device_type": device_type, "site": site_name}
+
+            # Додавання відсутніх статусів зі значенням 0
+            for status in status_list:
+                if status not in status_count:
+                    status_count[status] = 0
+
+            combined_entry.update(status_count)
+            # print(combined_entry)
+            list_dikt_all_status.append(combined_entry)
+
+        list_to_to_write = [
+            [device_type] + [status for status in status_list] + ["Total"]
+        ]
+        total_status_count = {status: 0 for status in status_list}
+        for dikt in list_dikt_all_status:
+            row = [dikt["site"]]
+            total = 0
+            for status in status_list:
+                row.append(str(dikt[status]))
+                total += dikt[status]
+                total_status_count[status] += dikt[status]
+            row.append(str(total))
+            list_to_to_write.append(row)
+        total_status_count = [str(total_status_count[status]) for status in status_list]
+        list_to_to_write.append(
+            ["Total"] + total_status_count + [str(sum(map(int, total_status_count)))]
+        )
+
+        write_report_gs(list_to_to_write, sheet_name="REPORT")
+
+        return self.get(request, *args, **kwargs)

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Reports: </h1>
+<form method="post" action="{% url 'device:reports' %}">
+  {% csrf_token %}
+    <label for="device_type">Select device type:</label>
+    <select name="device_type" id="device_type">
+        {% for device_type in device_type_list %}
+            <option value="{{ device_type.id }}">{{ device_type.name }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Generate report</button>
+  </form>
+{% endblock %}

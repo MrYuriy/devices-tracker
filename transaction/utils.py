@@ -24,32 +24,67 @@ httpAuth = credentials.authorize(httplib2.Http())
 service = apiclient.discovery.build("sheets", "v4", http=httpAuth)
 
 
+def write_report_gs(data, sheet_name):
+    body = {"values": data}
+
+    num_rows = len(data)
+    num_cols = len(data[0])
+
+    # Генеруємо діапазон у форматі 'Sheet1!A1:{last_column}{last_row}'
+    last_column = chr(ord("A") + num_cols - 1)
+    last_row = num_rows
+
+    range_ = f"{sheet_name}!A1:{last_column}{last_row}"
+
+    service.spreadsheets().values().clear(
+        spreadsheetId=spreadsheet_id,
+        range=f"{sheet_name}",
+    ).execute()
+
+    result = (
+        service.spreadsheets()
+        .values()
+        .update(
+            spreadsheetId=spreadsheet_id,
+            range=range_,
+            valueInputOption="RAW",
+            includeValuesInResponse=True,
+            body=body,
+        )
+        .execute()
+    )
+
+
 def write_dev_change_to_spreadsheet(
-        row_to_write,
-        row_index,
-        previous_row,
-        line_of_position_column,
-        spread_sheet_name
+    row_to_write, row_index, previous_row, line_of_position_column, spread_sheet_name
 ):
     """function for writing to google sheet"""
 
     for list_index, column_name in enumerate(line_of_position_column):
         if column_name == "Notatka":
-            row_to_write[list_index] = previous_row[list_index] + "\n" + row_to_write[list_index]
+            row_to_write[list_index] = (
+                previous_row[list_index] + "\n" + row_to_write[list_index]
+            )
 
     num_columns = len(row_to_write)
-    end_column_letter = chr(64 + num_columns)  # Перетворюємо число в літеру стовпця (A=1, B=2, ...)
+    end_column_letter = chr(
+        64 + num_columns
+    )  # Перетворюємо число в літеру стовпця (A=1, B=2, ...)
     update_range = f"{spread_sheet_name}!A{row_index}:{end_column_letter}{row_index}"
 
     value_input_option = "RAW"
     values = [row_to_write]
 
     # Виклик API для оновлення даних
-    request = service.spreadsheets().values().update(
-        spreadsheetId=spreadsheet_id,
-        range=update_range,
-        valueInputOption=value_input_option,
-        body={"values": values},
+    request = (
+        service.spreadsheets()
+        .values()
+        .update(
+            spreadsheetId=spreadsheet_id,
+            range=update_range,
+            valueInputOption=value_input_option,
+            body={"values": values},
+        )
     )
     response = request.execute()
 
@@ -64,7 +99,9 @@ def generate_line_to_write(device, line_of_position_column, notes):
             result_line.append(device.device_serial_number)
         elif "PORT" in field.split():
             port = device.device_ports.filter(site__name__icontains=field.split()[1])
-            result_line.append(port.values("name")[0]["name"] if port.values("name") else "")
+            result_line.append(
+                port.values("name")[0]["name"] if port.values("name") else ""
+            )
         elif field == "SITE":
             result_line.append(device.department.site.name)
         elif field == "Nazwa":
@@ -89,7 +126,9 @@ def read_from_spreadsheet(device, notes):
     response = (
         service.spreadsheets()
         .values()
-        .get(spreadsheetId=spreadsheet_id, range=device.device_type.name)  # Change "Sheet1" to your actual sheet name
+        .get(
+            spreadsheetId=spreadsheet_id, range=device.device_type.name
+        )  # Change "Sheet1" to your actual sheet name
         .execute()
     )
 
@@ -100,24 +139,26 @@ def read_from_spreadsheet(device, notes):
     line_of_position_column = values[2]
     # Search for the value in the specified column
     for row_index, row_values in enumerate(values):
-
         if device.name in row_values:
             device_coordinate = row_index + 1
             previous_row = row_values
             if len(line_of_position_column) > len(previous_row):
-                previous_row.extend(["" for i in range(len(line_of_position_column) - len(previous_row))])
+                previous_row.extend(
+                    [
+                        ""
+                        for i in range(len(line_of_position_column) - len(previous_row))
+                    ]
+                )
             break
     row_to_write = generate_line_to_write(
-        line_of_position_column=line_of_position_column,
-        device=device,
-        notes=notes
+        line_of_position_column=line_of_position_column, device=device, notes=notes
     )
     write_dev_change_to_spreadsheet(
         row_to_write=row_to_write,
         row_index=device_coordinate,
         previous_row=previous_row,
         line_of_position_column=line_of_position_column,
-        spread_sheet_name=device.device_type.name
+        spread_sheet_name=device.device_type.name,
     )
 
 
@@ -128,29 +169,45 @@ def create_transaction(user, device, changed_fields: dict) -> None:
 
     for field, value_dikt in changed_fields.items():
         if field == "device_type":
-            notes += f"changed device typ {value_dikt['old_value']} " \
-                     f"to {value_dikt['new_value']} "
+            notes += (
+                f"changed device typ {value_dikt['old_value']} "
+                f"to {value_dikt['new_value']} "
+            )
         if field == "name":
-            notes += f"changed device name {value_dikt['old_value']} " \
-                     f"to {value_dikt['new_value']} "
+            notes += (
+                f"changed device name {value_dikt['old_value']} "
+                f"to {value_dikt['new_value']} "
+            )
         if field == "device_serial_number":
-            notes += f"changed device serial number {value_dikt['old_value']} " \
-                     f"to {value_dikt['new_value']} and create new device "
+            notes += (
+                f"changed device serial number {value_dikt['old_value']} "
+                f"to {value_dikt['new_value']} and create new device "
+            )
         if field == "device_status":
-            notes += f"changed device status {value_dikt['old_value']} " \
-                     f"to {value_dikt['new_value']} "
+            notes += (
+                f"changed device status {value_dikt['old_value']} "
+                f"to {value_dikt['new_value']} "
+            )
         if field == "device_ip":
-            notes += f"changed device ip {value_dikt['old_value']} " \
-                     f"to {value_dikt['new_value']} "
+            notes += (
+                f"changed device ip {value_dikt['old_value']} "
+                f"to {value_dikt['new_value']} "
+            )
         if field == "device_ports":
-            notes += f"changed device ports {value_dikt['old_value']} " \
-                     f"to {value_dikt['new_value']} "
+            notes += (
+                f"changed device ports {value_dikt['old_value']} "
+                f"to {value_dikt['new_value']} "
+            )
         if field == "department":
-            notes += f"changed device status {value_dikt['old_value']} " \
-                     f"to {value_dikt['new_value']} "
+            notes += (
+                f"changed device status {value_dikt['old_value']} "
+                f"to {value_dikt['new_value']} "
+            )
         if field == "device_model":
-            notes += f"changed device model {value_dikt['old_value']} " \
-                     f"to {value_dikt['new_value']} "
+            notes += (
+                f"changed device model {value_dikt['old_value']} "
+                f"to {value_dikt['new_value']} "
+            )
 
     transaction = Transaction(user=user, device=device, notes=notes)
     transaction.save()
