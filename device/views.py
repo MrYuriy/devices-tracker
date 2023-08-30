@@ -176,14 +176,10 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
             queryset = queryset.filter(device_status__name__in=status_names)
 
         device_type_id = self.request.GET.get("device_type")
-        if device_type_id:
+        self.device_type_id = device_type_id
+        if device_type_id :
             device_type = get_object_or_404(DeviceType, pk=device_type_id)
             queryset = queryset.filter(device_type=device_type)
-
-        # department_name = self.request.GET.get("department")
-        # if department_name:
-        #     department_site_name, department_name = department_name.split(" - ")
-        #     queryset = queryset.filter(department__site__name=department_site_name, department__name=department_name)
 
         department_names = self.request.GET.getlist("department")
         if department_names:
@@ -199,11 +195,20 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         return queryset.order_by("name")
 
     def get_context_data(self, **kwargs):
+
+        queryset = self.queryset
         context = super().get_context_data(**kwargs)
-        context["device_status_list"] = Device.objects.values("device_status__name").distinct()
-        context["department_list"] = Device.objects.select_related('department__site').\
+
+        device_type_id = self.request.session.get("device_type")
+        if device_type_id and device_type_id != "":
+            context["device_type"] = device_type_id
+            queryset = self.queryset.filter(device_type__id=device_type_id)
+
+        context["device_status_list"] = queryset.values("device_status__name").distinct()
+        context["department_list"] = queryset.select_related('department__site').\
             values("department__site__name", "department__name").distinct()
-        context["device_site_list"] = Device.objects.values("department__site__name").distinct()
+        context["device_site_list"] = queryset.values("department__site__name").distinct()
+
         name = self.request.GET.get("name", "")
         device_serial_number = self.request.GET.get("name", "")
         context["search_form"] = DeviceSearchForm(
@@ -218,11 +223,6 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
 
         selected_departments = self.request.GET.getlist("department")
         context["selected_departments"] = selected_departments
-
-        device_type_id = self.request.session.get("device_type")
-        if device_type_id:
-            device_type = get_object_or_404(DeviceType, pk=device_type_id)
-            context["device_type"] = device_type
 
         return context
 
