@@ -100,39 +100,3 @@
 
 
 {% endblock %}
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const select = document.getElementById("site");
-
-    select.addEventListener("change", function () {
-        const selectedValues = Array.from(select.selectedOptions, option => option.value);
-        const searchParams = new URLSearchParams(window.location.search);
-
-        if (selectedValues.length > 0) {
-            searchParams.set("site", selectedValues.join(","));
-        } else {
-            searchParams.delete("site");
-        }
-
-        const newUrl = window.location.pathname + "?" + searchParams.toString();
-        window.history.replaceState({}, "", newUrl);
-    });
-
-    // Restore selected values on page load
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedSites = urlParams.get("site");
-    if (selectedSites) {
-        const sitesArray = selectedSites.split(",");
-        sitesArray.forEach(site => {
-            const option = select.querySelector(`option[value="${site}"]`);
-            if (option) {
-                option.selected = true;
-            }
-        });
-    }
-});
-</script>
-
-
-
