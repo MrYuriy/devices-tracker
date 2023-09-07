@@ -100,6 +100,7 @@ class Device(models.Model):
         DeviceDepartment, on_delete=models.CASCADE, related_name="devices"
     )
     device_model = models.CharField(max_length=255)
+    last_inventory = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.device_type} {self.name}: {self.device_serial_number}"

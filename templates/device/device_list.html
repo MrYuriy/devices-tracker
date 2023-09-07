@@ -49,16 +49,16 @@
   {% if device_list %}
   <p>Total devices: {{ device_list.count }}</p>
   <div class="table-responsive">
+    <button id="sendSelectedDevicesButton" class="btn btn-primary">Inventaryzyj</button>
     <table class="table">
       <thead class="thead-dark">
         <tr>
+          <th></th>
           <th>Name</th>
           <th>Device Type</th>
+          <th>Last inventory</th>
           <th>Serial Number</th>
-          <th>Status
-            
-
-          </th>
+          <th>Status</th>
           <th>IP</th>
           <th>Ports</th>
           <th>Department</th>
@@ -70,8 +70,12 @@
       <tbody>
         {% for device in device_list %}
         <tr>
+          <td>
+            <input type="checkbox" class="inventarisation-checkbox" data-device-id="{{ device.id }}">
+          </td>
           <td><a class="text-primary" href="{% url 'device:device-detail' pk=device.id %}">{{ device.name }}</a></td>
           <td>{{ device.device_type.name }}</td>
+          <td>{{ device.last_inventory|date:"Y-m-d" }}</td>
           <td>{{ device.device_serial_number }}</td>
           <td>{{ device.device_status.name }}</td>
           <td>{{ device.device_ip.ip }}</td>

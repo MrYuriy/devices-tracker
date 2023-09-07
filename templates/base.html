@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  {% csrf_token %}
   {% block title %}<title>Device System</title>{% endblock %}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -38,6 +39,56 @@
     </div>
   </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  var selectedDeviceIds = []; // Масив для зберігання ідентифікаторів вибраних пристроїв
+  var csrfToken = $('input[name=csrfmiddlewaretoken]').val();
+
+  // Слідкуємо за змінами стану чекбоксів
+  $('.inventarisation-checkbox').change(function() {
+    var deviceId = $(this).data('device-id');
+    var isChecked = $(this).prop('checked');
+
+    // Додаємо або видаляємо ідентифікатор пристрою з масиву в залежності від стану чекбокса
+    if (isChecked) {
+      selectedDeviceIds.push(deviceId);
+    } else {
+      var index = selectedDeviceIds.indexOf(deviceId);
+      if (index !== -1) {
+        selectedDeviceIds.splice(index, 1);
+      }
+    }
+  });
+
+  // Обробник для кнопки, яка надсилатиме запити на сервер для всіх вибраних пристроїв
+  $('#sendSelectedDevicesButton').click(function() {
+    if (selectedDeviceIds.length > 0) {
+      // Відправляємо масив ідентифікаторів на сервер
+      $.ajax({
+        type: 'POST',
+        url: '/devices/inventarisation/',  // Замініть цей URL на URL вашого перегляду для оновлення даних
+        data: {
+          'device_ids': selectedDeviceIds,
+          'csrfmiddlewaretoken': csrfToken
+        },
+        success: function(data) {
+          // Опрацьовуємо успішну відповідь від сервера
+          console.log(data);
+        },
+        error: function(xhr, status, error) {
+          // Обробляємо помилки
+          console.error(xhr.responseText);
+        }
+      });
+    }
+  });
+});
+
+</script>
+
 </body>
 
 </html>

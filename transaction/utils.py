@@ -56,14 +56,13 @@ def write_report_gs(data, sheet_name):
 
 
 def write_dev_change_to_spreadsheet(
-    row_to_write, row_index, previous_row, line_of_position_column, spread_sheet_name
+        row_to_write, row_index, previous_row, line_of_position_column, spread_sheet_name
 ):
     """function for writing to google sheet"""
-
     for list_index, column_name in enumerate(line_of_position_column):
         if column_name == "Notatka":
             row_to_write[list_index] = (
-                previous_row[list_index] + "\n" + row_to_write[list_index]
+                    previous_row[list_index] + "\n" + row_to_write[list_index]
             )
 
     num_columns = len(row_to_write)
@@ -114,6 +113,8 @@ def generate_line_to_write(device, line_of_position_column, notes):
             result_line.append(notes)
         elif field == "IP":
             result_line.append(device.device_ip.ip)
+        elif field == "Inventaryzoano":
+            result_line.append(str(device.last_inventory))
         else:
             result_line.append("")
 
@@ -181,7 +182,7 @@ def create_transaction(user, device, changed_fields: dict) -> None:
         if field == "device_serial_number":
             notes += (
                 f"changed device serial number {value_dikt['old_value']} "
-                f"to {value_dikt['new_value']} and create new device "
+                f"to {value_dikt['new_value']}"
             )
         if field == "device_status":
             notes += (
@@ -208,7 +209,60 @@ def create_transaction(user, device, changed_fields: dict) -> None:
                 f"changed device model {value_dikt['old_value']} "
                 f"to {value_dikt['new_value']} "
             )
+        if field == "last_inventory":
+            notes += (
+                f"inventoried"
+            )
 
     transaction = Transaction(user=user, device=device, notes=notes)
     transaction.save()
     read_from_spreadsheet(device=device, notes=notes)
+
+
+def multy_write_last_inventory(dev_name_list, dev_type):
+    response = (
+        service.spreadsheets()
+        .values()
+        .get(
+            spreadsheetId=spreadsheet_id, range=dev_type
+        )  # Change "Sheet1" to your actual sheet name
+        .execute()
+    )
+
+    values_sheet = response.get("values", [])
+    line_of_position_column = values_sheet[2]
+    name_index = line_of_position_column.index("Nazwa")
+    last_inventory_index = line_of_position_column.index("Inventaryzoano")
+
+    for index_row, row in enumerate(values_sheet[4:]):
+        if len(line_of_position_column) > len(row):
+            row.extend(
+                ["" for i in range(len(line_of_position_column) - len(row))]
+            )
+        if row[name_index] in dev_name_list:
+            values_sheet[index_row+4][last_inventory_index] = str(date.today())
+
+    num_columns = len(line_of_position_column)
+    end_column_letter = chr(
+        64 + num_columns
+    )
+
+    range_ = f"{dev_type}!A4:{end_column_letter}{len(values_sheet)}"
+    try:
+        result = (
+            service.spreadsheets()
+            .values()
+            .update(
+                spreadsheetId=spreadsheet_id,
+                range=range_,
+                valueInputOption="RAW",
+                includeValuesInResponse=True,
+                body={"values": values_sheet[3:]},
+            )
+            .execute()
+        )
+    except Exception as e:
+        print(f"Помилка: {e}")
+        print("Вміст values_sheet:")
+        for row in values_sheet:
+            print(row)

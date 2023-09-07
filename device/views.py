@@ -4,6 +4,11 @@ from collections import defaultdict
 from django.db.models import Count
 from itertools import groupby
 
+from django.http import JsonResponse
+from django.views import View
+from django.shortcuts import get_object_or_404
+
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models, transaction
 from django.db.models import Q
@@ -26,6 +31,7 @@ from transaction.utils import (
     write_dev_change_to_spreadsheet,
     write_report_gs,
     read_from_spreadsheet,
+    multy_write_last_inventory
 )
 
 from .models import (
@@ -457,3 +463,15 @@ class ReportsView(TemplateView):
         write_report_gs(list_to_to_write, sheet_name="REPORT")
 
         return self.get(request, *args, **kwargs)
+
+
+class UpdateInventoryView(View):
+    def post(self, request):
+        device_ids = request.POST.getlist('device_ids[]')
+        dev_list = Device.objects.filter(pk__in=device_ids)
+        dev_list.update(last_inventory=date.today())
+        if device_ids:
+            dev_name_list = dev_list.values_list('name', flat=True)
+            dev_type = dev_list[0].device_type.name
+            multy_write_last_inventory(dev_name_list, dev_type)
+        return JsonResponse({'message': 'Inventarisation updated successfully'})
