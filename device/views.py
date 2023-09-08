@@ -181,6 +181,10 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         if status_names:
             queryset = queryset.filter(device_status__name__in=status_names)
 
+        show_empty_last_inventory = self.request.GET.get("show_empty_last_inventory")
+        if show_empty_last_inventory:
+            queryset = queryset.filter(last_inventory__isnull=True)
+
         device_type_id = self.request.GET.get("device_type")
         self.device_type_id = device_type_id
         if device_type_id:
