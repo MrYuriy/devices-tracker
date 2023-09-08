@@ -40,6 +40,10 @@
         {% endfor %}
     </select>
 
+    <label for="show_empty_last_inventory">
+      <input type="checkbox" name="show_empty_last_inventory" id="show_empty_last_inventory" {% if show_empty_last_inventory %}checked{% endif %}>
+        No inventory
+    </label>
 
     <input type="hidden" name="device_type" value="{{ request.GET.device_type }}">
 

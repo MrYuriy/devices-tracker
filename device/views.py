@@ -183,7 +183,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
 
         device_type_id = self.request.GET.get("device_type")
         self.device_type_id = device_type_id
-        if device_type_id :
+        if device_type_id:
             device_type = get_object_or_404(DeviceType, pk=device_type_id)
             queryset = queryset.filter(device_type=device_type)
 
@@ -214,6 +214,9 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         context["department_list"] = queryset.select_related('department__site').\
             values("department__site__name", "department__name").distinct()
         context["device_site_list"] = queryset.values("department__site__name").distinct()
+
+        show_empty_last_inventory = self.request.GET.get("show_empty_last_inventory")
+        context["show_empty_last_inventory"] = show_empty_last_inventory
 
         name = self.request.GET.get("name", "")
         device_serial_number = self.request.GET.get("name", "")
