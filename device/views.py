@@ -205,7 +205,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         queryset = self.queryset
         context = super().get_context_data(**kwargs)
 
-        device_type_id = self.request.session.get("device_type")
+        device_type_id = self.request.GET.get("device_type")
         if device_type_id and device_type_id != "":
             context["device_type"] = device_type_id
             queryset = self.queryset.filter(device_type__id=device_type_id)
