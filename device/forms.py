@@ -32,7 +32,7 @@ class DeviceIPForm(forms.ModelForm):
 
 
 class DeviceUpdateCreateForm(forms.ModelForm):
-    last_inventory = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    last_inventory = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
     class Meta:
         model = Device
