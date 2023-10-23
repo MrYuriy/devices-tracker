@@ -8,13 +8,13 @@ from user.models import User
 
 from .forms import UserCreationForm, UserSearchForm, UserUpdateForm
 
+
 # Create your views here.
 
 
 class UserListView(LoginRequiredMixin, generic.ListView):
     model = User
     paginate_by = 10
-
 
     def get_context_data(self, **kwargs):
         context = super(UserListView, self).get_context_data(**kwargs)
@@ -36,7 +36,6 @@ class UserListView(LoginRequiredMixin, generic.ListView):
         return queryset
 
 
-
 class UserCreateView(LoginRequiredMixin, generic.CreateView):
     model = User
     form_class = UserCreationForm
@@ -46,7 +45,6 @@ class UserCreateView(LoginRequiredMixin, generic.CreateView):
 class UserUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = User
     form_class = UserUpdateForm
-
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -64,7 +62,7 @@ class UserUpdateView(LoginRequiredMixin, generic.UpdateView):
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return self.object.get_absolute_url() 
+        return self.object.get_absolute_url()
 
 
 class UserDeleteView(LoginRequiredMixin, generic.DeleteView):

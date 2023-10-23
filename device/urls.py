@@ -133,7 +133,11 @@ urlpatterns = [
     path("devices/<int:pk>/delete/", DeviceDeleteView.as_view(), name="device-delete"),
     path("", HomeView.as_view(), name="home"),
     path("report", ReportsView.as_view(), name="reports"),
-    path('devices/inventarisation/', UpdateInventoryView.as_view(), name='inventarisation'),
+    path(
+        "devices/inventarisation/",
+        UpdateInventoryView.as_view(),
+        name="inventarisation",
+    ),
 ]
 
 app_name = "device"

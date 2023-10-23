@@ -8,10 +8,9 @@ from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import get_object_or_404
 
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
@@ -31,7 +30,7 @@ from transaction.utils import (
     write_dev_change_to_spreadsheet,
     write_report_gs,
     read_from_spreadsheet,
-    multy_write_last_inventory
+    multy_write_last_inventory,
 )
 
 from .models import (
@@ -164,18 +163,26 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
     model = Device
     template_name = "device/device_list.html"
     context_object_name = "device_list"
-    queryset = Device.objects.all()
-    # paginate_by = 20
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = (
+            super()
+            .get_queryset()
+            .select_related(
+                "device_type",
+                "device_status",
+                "device_ip",
+                "department__site",
+            )
+            .prefetch_related("device_ports")
+        )
 
         form = DeviceSearchForm(self.request.GET)
         if form.is_valid():
-            queryset = queryset.filter(
-                Q(name__icontains=form.cleaned_data["name"])
-                | Q(device_serial_number__icontains=form.cleaned_data["name"])
+            query = Q(name__icontains=form.cleaned_data["name"]) | Q(
+                device_serial_number__icontains=form.cleaned_data["name"]
             )
+            queryset = queryset.filter(query)
 
         status_names = self.request.GET.getlist("status")
         if status_names:
@@ -186,7 +193,6 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
             queryset = queryset.filter(last_inventory__isnull=True)
 
         device_type_id = self.request.GET.get("device_type")
-        self.device_type_id = device_type_id
         if device_type_id:
             device_type = get_object_or_404(DeviceType, pk=device_type_id)
             queryset = queryset.filter(device_type=device_type)
@@ -194,10 +200,10 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         department_names = self.request.GET.getlist("department")
         if department_names:
             departments = [name.split(" ") for name in department_names]
-            queryset = queryset.filter(
-                Q(department__site__name__in=[site for site, _ in departments]) &
-                Q(department__name__in=[dept for _, dept in departments])
+            query = Q(department__site__name__in=[site for site, _ in departments]) & Q(
+                department__name__in=[dept for _, dept in departments]
             )
+            queryset = queryset.filter(query)
 
         site_list = self.request.GET.getlist("site")
         if site_list:
@@ -205,19 +211,42 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         return queryset.order_by("name")
 
     def get_context_data(self, **kwargs):
-
-        queryset = self.queryset
         context = super().get_context_data(**kwargs)
+
+        # Get the queryset once and store it
+        queryset = self.get_queryset()
 
         device_type_id = self.request.GET.get("device_type")
         if device_type_id and device_type_id != "":
             context["device_type"] = device_type_id
-            queryset = self.queryset.filter(device_type__id=device_type_id)
 
-        context["device_status_list"] = queryset.values("device_status__name").distinct()
-        context["department_list"] = queryset.select_related('department__site').\
-            values("department__site__name", "department__name").distinct()
-        context["device_site_list"] = queryset.values("department__site__name").distinct()
+        # Get values for device_status__name
+        device_status_list = queryset.values("device_status__name").distinct()
+        status_values = list(
+            set([entry["device_status__name"] for entry in device_status_list])
+        )
+        context["device_status_list"] = status_values
+
+        # Get values for department__site__name and department__name
+        department_list = queryset.values(
+            "department__site__name", "department__name"
+        ).distinct()
+        department_value = list(
+            set(
+                [
+                    f"{entry['department__site__name']} {entry['department__name']}"
+                    for entry in department_list
+                ]
+            )
+        )
+        context["department_list"] = department_value
+
+        # Get values for department__site__name
+        device_site_list = queryset.values("department__site__name").distinct()
+        site_values = list(
+            set([entry["department__site__name"] for entry in device_site_list])
+        )
+        context["device_site_list"] = site_values
 
         show_empty_last_inventory = self.request.GET.get("show_empty_last_inventory")
         context["show_empty_last_inventory"] = show_empty_last_inventory
@@ -235,6 +264,7 @@ class DeviceListView(LoginRequiredMixin, generic.ListView):
         context["selected_statuses"] = selected_statuses
 
         selected_departments = self.request.GET.getlist("department")
+
         context["selected_departments"] = selected_departments
 
         return context
@@ -474,11 +504,11 @@ class ReportsView(TemplateView):
 
 class UpdateInventoryView(View):
     def post(self, request):
-        device_ids = request.POST.getlist('device_ids[]')
+        device_ids = request.POST.getlist("device_ids[]")
         dev_list = Device.objects.filter(pk__in=device_ids)
         dev_list.update(last_inventory=date.today())
         if device_ids:
-            dev_name_list = dev_list.values_list('name', flat=True)
+            dev_name_list = dev_list.values_list("name", flat=True)
             dev_type = dev_list[0].device_type.name
             multy_write_last_inventory(dev_name_list, dev_type)
-        return JsonResponse({'message': 'Inventarisation updated successfully'})
+        return JsonResponse({"message": "Inventarisation updated successfully"})
