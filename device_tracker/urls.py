@@ -21,5 +21,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("device.urls", namespace="device")),
     path("", include("user.urls", namespace="user")),
+    path("", include("telegram_bot.urls", namespace="telegram-bot")),
     path("accounts/", include("django.contrib.auth.urls")),
 ]
