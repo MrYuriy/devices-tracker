@@ -32,6 +32,8 @@ DEBUG = True
 ALLOWED_HOSTS = ["127.0.0.1", "devtracker.onrender.com"]
 
 SPREADSHEET_ID = os.environ["SPREADSHEET_ID"]
+TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+BASE_URL = os.environ["BASE_URL"]
 # Application definition
 
 INSTALLED_APPS = [
