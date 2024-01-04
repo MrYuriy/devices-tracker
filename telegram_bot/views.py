@@ -21,6 +21,8 @@ class TelegramWebhookView(View):
 
     def post(self, request, *args, **kwargs):
         update = Update.de_json(json.loads(request.body.decode('utf-8')), bot)
+        print(update)
+        print(update.message)
         process_message(update.message)
         return JsonResponse({'status': 'ok'})
 
