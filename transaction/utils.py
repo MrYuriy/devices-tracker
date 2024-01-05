@@ -266,3 +266,21 @@ def multy_write_last_inventory(dev_name_list, dev_type):
         print("Вміст values_sheet:")
         for row in values_sheet:
             print(row)
+
+
+
+def read_all_sheets(spreadsheet_id=spreadsheet_id):
+    sheets = service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+    not_dev_st_list = ["UWAGI", "REPORT"]
+    sheet_names = [sheet["properties"]["title"] for sheet in sheets["sheets"] if sheet["properties"]["title"] not in not_dev_st_list]
+    data = []
+
+    for sheet_name in sheet_names:
+        range_name = f"{sheet_name}!A1:ZZ"  # Adjust the range based on your data
+        result = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
+        values = result.get('values', [])
+
+        if values:
+            data.append(values)
+
+    return data
