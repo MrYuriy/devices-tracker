@@ -27,4 +27,6 @@ def filter_data_by_info(target_text, sheet_data):
             row = " ".join([cel for cel in row_list if cel!=""])
             if target_text.lower() in row.lower():
                 device_info = device_info + "\n\n" + row.replace("\n", " ")
+    if device_info == "":
+        device_info = "Brak informacji"
     return device_info       
