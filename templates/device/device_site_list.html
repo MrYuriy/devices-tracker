@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Sites</h1>
+  {% if device_site_list %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>Update</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for site in device_site_list %}
+          <tr>
+              <td>{{ site.name }}</td>
+              <td><a class="text-info" href="{% url 'device:device-site-update' pk=site.id %}">Update</a></td>
+              <td><a class="text-danger" href="{% url 'device:device-site-delete' pk=site.id %}">Delete</a></td>
+          </tr>
+          
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>There are no sites in Site!</p>
+  {% endif %}
+
+  <a class="button" style="float: right;" href="{% url 'device:device-site-create' %}">Create</a>
+
+ 
+
+{% endblock %}

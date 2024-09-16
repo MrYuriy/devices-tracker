@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Devices</h1>
+
+
+  {% block search_form %}
+    {% include "includes/search_form.html" %}
+  {% endblock %}
+
+
+<form method="get">
+
+<form method="get" action="{% url 'device:device-list' %}">
+    <label for="status">Filter by Status:</label>
+    <select name="status" id="status">
+        <option value="">All</option>
+        {% for status in device_status_list %}
+            <option value="{{ status.id }}" {% if request.GET.status|default_if_none:'' == status.id|stringformat:"s" %}selected{% endif %}>{{ status.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="department">Filter by Department:</label>
+    <select name="department" id="department">
+        <option value="">All</option>
+        {% for department in department_list %}
+            <option value="{{ department.id }}" {% if request.GET.department|default_if_none:'' == department.id|stringformat:"s" %}selected{% endif %}>{{ department.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="hidden" name="device_type" value="{{ request.GET.device_type }}">
+
+    <button type="submit">Apply Filter</button>
+  </form>
+  {% if device_list %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>Device Type</th>
+          <th>Serial Number</th>
+          <th>Status
+            
+
+          </th>
+          <th>IP</th>
+          <th>Ports</th>
+          <th>Department</th>
+          <th>Model</th>
+          <th>Update</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for device in device_list %}
+        <tr>
+          <td><a class="text-primary" href="{% url 'device:device-detail' pk=device.id %}">{{ device.name }}</a></td>
+          <td>{{ device.device_type.name }}</td>
+          <td>{{ device.device_serial_number }}</td>
+          <td>{{ device.device_status.name }}</td>
+          <td>{{ device.device_ip.ip }}</td>
+          <td>
+            {% if device.device_ports %}
+            {% for port in device.device_ports.all %}
+              {{ port.name }}
+            {% endfor %}
+            {% else %}
+              <p>-</p>
+            {% endif %}
+          </td>
+          <td>{{ device.department }}</td>
+          <td>{{ device.device_model }}</td>
+           <td><a class="text-info" href="{% url 'device:device-update' pk=device.id %}">Update</a></td>
+           <td><a class="text-danger" href="{% url 'device:device-delete' pk=device.id %}">Delete</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>There are no devices in Device!</p>
+  {% endif %}
+
+  <a class="button" style="float: right;" href="{% url 'device:device-create' %}">Create</a>
+
+{% endblock %}

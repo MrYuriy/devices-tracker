@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Ports</h1>
+  {% if device_port_list %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>Site</th>
+          <th>Update</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for port in device_port_list %}
+          <tr>
+              <td>{{ port.name }}</td>
+              <td>{{ port.site.name }}</td>
+              <td><a class="text-info" href="{% url 'device:device-port-update' pk=port.id %}">Update</a></td>
+              <td><a class="text-danger" href="{% url 'device:device-port-delete' pk=port.id %}">Delete</a></td>
+          </tr>
+          
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>There are no ports in Port!</p>
+  {% endif %}
+
+  <a class="button" style="float: right;" href="{% url 'device:device-port-create' %}">Create</a>
+
+ 
+
+{% endblock %}

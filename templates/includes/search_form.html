@@ -1,0 +1,15 @@
+{% load crispy_forms_filters %}
+
+<form action="" method="get">
+    <div class="input-group">
+      <div class="form-outline">
+        {{ search_form|crispy }}
+        
+      </div>
+      
+      <button type="submit" class="btn btn-secondary">
+        <i class="fa fa-search"></i>
+      </button>
+      
+    </div>
+</form>

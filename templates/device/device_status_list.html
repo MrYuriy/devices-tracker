@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Statuses</h1>
+  {% if device_status_list %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>Update</th>
+          <th>Delete</th>
+
+        </tr>
+      </thead>
+      <tbody>
+          {% for status in device_status_list %}
+          <tr>
+              <td>{{ status.name }}</td>
+             
+              <td><a class="text-info" href="{% url 'device:device-status-update' pk=status.id %}">Update</a></td>
+              <td><a class="text-danger" href="{% url 'device:device-status-delete' pk=status.id %}">Delete</a></td>
+          </tr>
+          
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>There are no statuses in Status!</p>
+  {% endif %}
+
+  <a class="button" style="float: right;" href="{% url 'device:device-status-create' %}">Create</a>
+
+ 
+
+{% endblock %}

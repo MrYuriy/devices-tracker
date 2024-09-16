@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Types</h1>
+  {% if device_type_list %}
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th>Name</th>
+          <th>Update</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for type in device_type_list %}
+          <tr>
+              <td>{{ type.name }}</td>
+             
+              <td><a class="text-info" href="{% url 'device:device-type-update' pk=type.id %}">Update</a></td>
+              <td><a class="text-danger" href="{% url 'device:device-type-delete' pk=type.id %}">Delete</a></td>
+          </tr>
+          
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>There are no types in Type!</p>
+  {% endif %}
+
+  <a class="button" style="float: right;" href="{% url 'device:device-type-create' %}">Create</a>
+
+ 
+
+{% endblock %}
