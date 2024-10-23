@@ -29,7 +29,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "devtracker.onrender.com", ".ngrok.io", "b95c-83-1-184-46.ngrok-free.app"]
+ALLOWED_HOSTS = ["*"]
 
 SPREADSHEET_ID = os.environ["SPREADSHEET_ID"]
 TELEGRAM_BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
