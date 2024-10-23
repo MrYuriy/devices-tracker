@@ -135,7 +135,7 @@ celerybeat.pid
 .env
 .venv
 env/
-venv/
+devtrac_env/
 ENV/
 env.bak/
 venv.bak/
